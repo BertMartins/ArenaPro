@@ -1,53 +1,61 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
-import { verifyToken } from "@/lib/jwt";
+import prisma from "@/lib/prisma";
+import { getAuthUser } from "@/lib/auth";
 
-export async function GET(req: Request) {
+export async function GET() {
   try {
-    const token = req.headers.get("cookie")?.split("volei_token=")[1];
-
-    if (!token) {
+    const auth = await getAuthUser();
+    if (!auth) {
       return NextResponse.json({ error: "Não autenticado" }, { status: 401 });
     }
 
-    const decoded: any = await verifyToken(token);
-    const userId = decoded.id;
+    const userId = auth.id;
 
-    // Stats do jogador
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    // Stats do usuário
     const stats = await prisma.userStats.findUnique({
       where: { userId },
     });
 
-    // Jogos que ele participa
-    const meusJogos = await prisma.gamePlayer.findMany({
-      where: { userId },
-      include: { game: true },
-      orderBy: { joinedAt: "desc" },
-    });
-
-    // Jogos disponíveis
-    const jogosDisponiveis = await prisma.game.findMany({
-      where: { status: "open" },
-      include: { players: true },
+    // Jogos de hoje
+    const gamesToday = await prisma.game.findMany({
+      where: { date: { gte: today } },
+      include: {
+        createdBy: true,
+        players: { include: { user: true } },
+      },
       orderBy: { date: "asc" },
     });
 
-    // Últimos campeões
-    const ultimosGames = await prisma.game.findMany({
-      where: { championId: { not: null } },
-      include: { champion: true },
-      orderBy: { createdAt: "desc" },
-      take: 5,
+    // Jogos em que ele está inscrito
+    const myGames = await prisma.gamePlayer.findMany({
+      where: { userId },
+      include: {
+        game: {
+          include: {
+            players: { include: { user: true } },
+            createdBy: true,
+          },
+        },
+      },
+      orderBy: { timestamp: "desc" },
     });
 
     return NextResponse.json({
-      stats,
-      meusJogos,
-      jogosDisponiveis,
-      ultimosGames,
+      dashboard: {
+        stats: stats || { wins: 0, losses: 0, titles: 0, level: 1 },
+        gamesToday,
+        myGames,
+        currentUserId: userId,
+      },
     });
-  } catch (error) {
-    console.error(error);
-    return NextResponse.json({ error: "Erro interno" }, { status: 500 });
+  } catch (err) {
+    console.error(err);
+    return NextResponse.json(
+      { error: "Erro ao carregar dashboard do jogador" },
+      { status: 500 }
+    );
   }
 }

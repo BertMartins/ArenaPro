@@ -21,37 +21,180 @@ body {
   font-family: 'Poppins', sans-serif;
 }
 
-/* Efeito Glass */
+
+/* --------------------------------------------------
+   GLASS CARD
+-------------------------------------------------- */
 .glass-card {
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
 }
 
-/* Botão primário */
+/* --------------------------------------------------
+   INPUTS MODERNOS
+-------------------------------------------------- */
+.custom-input {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  transition: all .2s ease;
+}
+
+.custom-input:focus {
+  border-color: #ff7a1e;
+  box-shadow: 0 0 12px rgba(255, 122, 30, 0.45);
+  outline: none;
+}
+
+/* --------------------------------------------------
+   BOTÃO PRINCIPAL
+-------------------------------------------------- */
 .btn-primary {
-  background: linear-gradient(90deg, #F97316, #fb923c);
-  transition: 0.2s ease;
+  background: linear-gradient(90deg, #ff7a1e, #ff9a3d);
+  color: white;
+  font-weight: 700;
+  transition: all .2s ease;
+  text-align: center;
 }
 
 .btn-primary:hover {
-  filter: brightness(1.15);
-  transform: scale(1.02);
+  opacity: 0.9;
+  box-shadow: 0 0 15px rgba(255, 122, 30, 0.5);
 }
 
-/* Entradas */
-input {
-  transition: 0.2s ease;
+.btn-primary:disabled {
+  opacity: 0.5;
 }
 
-input:focus {
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.4);
+/* --------------------------------------------------
+   BOTÃO SECUNDÁRIO
+-------------------------------------------------- */
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: white;
+  transition: .2s;
 }
 
-/* animação inicial das telas */
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* --------------------------------------------------
+   BADGES (NÍVEL, STATUS, ETC.)
+-------------------------------------------------- */
+.badge {
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.badge-success {
+  background: #16a34a33;
+  color: #4ade80;
+}
+
+.badge-warning {
+  background: #f59e0b33;
+  color: #fbbf24;
+}
+
+.badge-danger {
+  background: #dc262633;
+  color: #f87171;
+}
+
+.badge-info {
+  background: #0ea5e933;
+  color: #38bdf8;
+}
+
+/* --------------------------------------------------
+   CARDS GLOW
+-------------------------------------------------- */
+.card-glow {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 0 20px rgba(255, 122, 30, 0.2);
+}
+
+/* --------------------------------------------------
+   ANIMAÇÕES
+-------------------------------------------------- */
+
+@keyframes fadeIn {
+  0% { opacity: 0; transform: translateY(14px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideIn {
+  0% { opacity: 0; transform: translateX(-20px); }
+  100% { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes bounceSoft {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+@keyframes pulseSoft {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+.animate-slideIn {
+  animation: slideIn 0.5s ease-out forwards;
+}
+
+.animate-bounceSoft {
+  animation: bounceSoft 2s infinite;
+}
+
+.animate-pulseSoft {
+  animation: pulseSoft 2s infinite;
+}
+
+/* --------------------------------------------------
+   DIVISOR ESTILIZADO
+-------------------------------------------------- */
+.hr-soft {
+  border: 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  margin: 20px 0;
+}
+
+/* --------------------------------------------------
+   SCROLLBAR CUSTOM
+-------------------------------------------------- */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* --------------------------------------------------
+   PÁGINAS GERAIS
+-------------------------------------------------- */
 .page-animate {
-  animation: fadeIn .5s ease-out forwards;
+  animation: fadeIn 0.6s ease-out;
+}
+
+.title-font {
+  letter-spacing: -0.03em;
 }

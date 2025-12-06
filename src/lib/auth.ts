@@ -1,40 +1,30 @@
 import { cookies } from "next/headers";
-import jwt from "jsonwebtoken";
+import { jwtVerify } from "jose";
 
-const COOKIE_NAME = "volei_token";
+const SECRET = new TextEncoder().encode(process.env.JWT_SECRET!);
 
-// SALVAR TOKEN -----------------------------------------------------
-export async function setUserToken(token: string) {
-  const c = await cookies();
-
-  c.set({
-    name: COOKIE_NAME,
-    value: token,
-    httpOnly: true,
-    secure: true,
-    sameSite: "strict",
-    path: "/",
-    maxAge: 60 * 60 * 24 * 7, // 7 dias
-  });
+export interface AuthUser {
+  id: string;
+  role: "admin" | "player" | "visitor";
+  name: string;
+  email: string;
+  paymentType?: "monthly" | "daily";
 }
 
-// LER TOKEN --------------------------------------------------------
-export async function getUserFromCookie() {
-  const c = await cookies();
-  const token = c.get(COOKIE_NAME)?.value;
+export async function getAuthUser(): Promise<AuthUser | null> {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("volei_token")?.value;
 
   if (!token) return null;
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!);
-    return decoded;
-  } catch {
+    const { payload } = await jwtVerify(token, SECRET);
+
+    // 👇 Correção do TypeScript (payload → unknown → AuthUser)
+    return payload as unknown as AuthUser;
+
+  } catch (err) {
+    console.error("Token inválido:", err);
     return null;
   }
-}
-
-// REMOVER TOKEN ----------------------------------------------------
-export async function removeUserToken() {
-  const c = await cookies();
-  c.delete(COOKIE_NAME);
 }

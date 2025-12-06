@@ -1,46 +1,50 @@
 import { NextResponse } from "next/server";
 import { jwtVerify } from "jose";
 
+const SECRET = new TextEncoder().encode(process.env.JWT_SECRET!);
+
 export async function middleware(req: any) {
-  const { pathname } = req.nextUrl;
   const token = req.cookies.get("volei_token")?.value;
 
-  const publicRoutes = ["/login", "/register", "/forgot-password"];
+  const url = req.nextUrl.pathname;
 
-  // se rota é pública → segue
-  if (publicRoutes.includes(pathname)) {
+  // 🔓 Rotas públicas
+  if (
+    url.startsWith("/login") ||
+    url.startsWith("/register") ||
+    url.startsWith("/forgot-password") ||
+    url.startsWith("/api/auth")
+  ) {
     return NextResponse.next();
   }
 
-  // se não tem token → redireciona
   if (!token) {
     return NextResponse.redirect(new URL("/login", req.url));
   }
 
-  // tenta verificar o token
   try {
-    await jwtVerify(
-      token,
-      new TextEncoder().encode(process.env.JWT_SECRET!)
-    );
+    const { payload } = await jwtVerify(token, SECRET);
+
+    // 🔥 Proteção de rotas ADMIN
+    if (url.startsWith("/dashboard") && payload.role !== "admin") {
+      return NextResponse.redirect(new URL("/player", req.url));
+    }
+
+    // 🔥 Proteção de rota PLAYER
+    if (url.startsWith("/player") && payload.role === "admin") {
+      return NextResponse.redirect(new URL("/dashboard", req.url));
+    }
 
     return NextResponse.next();
   } catch (err) {
-    console.error("Erro JWT:", err);
-
-    // remove cookie inválido
-    const res = NextResponse.redirect(new URL("/login", req.url));
-    res.cookies.set("volei_token", "", { expires: new Date(0), path: "/" });
-    return res;
+    console.log("Invalid Token:", err);
+    return NextResponse.redirect(new URL("/login", req.url));
   }
 }
 
 export const config = {
   matcher: [
     "/dashboard/:path*",
-    "/dashboard",
     "/player/:path*",
-    "/player"
-  ]
+  ],
 };
-

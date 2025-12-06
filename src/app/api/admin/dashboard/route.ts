@@ -1,46 +1,58 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import prisma from "@/lib/prisma";
+import { getAuthUser } from "@/lib/auth";
 
 export async function GET() {
   try {
-    // Total de usuários
-    const totalUsuarios = await prisma.user.count();
+    const auth = await getAuthUser();
+    if (!auth || auth.role !== "admin") {
+      return NextResponse.json({ error: "Não autorizado" }, { status: 403 });
+    }
 
-    // Total de jogadores
-    const totalJogadores = await prisma.user.count({
-      where: { role: "player" },
-    });
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
-    // Total de jogos
-    const totalJogos = await prisma.game.count();
+    const stats = {
+      totalUsers: await prisma.user.count(),
+      totalMonthly: await prisma.user.count({ where: { paymentType: "monthly" } }),
+      totalDaily: await prisma.user.count({ where: { paymentType: "daily" } }),
+    };
 
-    // Últimos campeões
-    const ultimosGames = await prisma.game.findMany({
-      where: { championId: { not: null } },
-      include: { champion: true },
-      orderBy: { createdAt: "desc" },
-      take: 5,
-    });
-
-    // Jogos disponíveis (abertos)
-    const jogosDisponiveis = await prisma.game.findMany({
-      where: { status: "open" },
+    const gamesToday = await prisma.game.findMany({
+      where: { date: { gte: today } },
       include: {
-        players: true,
+        createdBy: true,
+        champion: true,
+        players: { include: { user: true } }
       },
-      orderBy: { date: "asc" },
-      take: 10,
+      orderBy: { date: "asc" }
+    });
+
+    const lastGames = await prisma.game.findMany({
+      where: { status: "finished" },
+      take: 5,
+      orderBy: { createdAt: "desc" },
+      include: { champion: true }
+    });
+
+    const recentFinancial = await prisma.financialEntry.findMany({
+      take: 5,
+      orderBy: { date: "desc" },
+      include: { user: true, game: true }
     });
 
     return NextResponse.json({
-      totalUsuarios,
-      totalJogadores,
-      totalJogos,
-      ultimosGames,
-      jogosDisponiveis,
+      dashboard: {
+        stats,
+        gamesToday,
+        lastGames,
+        recentFinancial,
+        currentUserId: auth.id
+      }
     });
-  } catch (error) {
-    console.error(error);
-    return NextResponse.json({ error: "Erro ao carregar dashboard" }, { status: 500 });
+
+  } catch (err) {
+    console.error(err);
+    return NextResponse.json({ error: "Falha ao carregar dashboard" }, { status: 500 });
   }
 }

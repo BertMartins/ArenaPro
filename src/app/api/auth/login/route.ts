@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import prisma from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { signToken } from "@/lib/jwt";
 
@@ -19,7 +19,6 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Senha incorreta" }, { status: 401 });
     }
 
-    // 🔥 CORREÇÃO AQUI — signToken agora tem await
     const token = await signToken({
       id: user.id,
       role: user.role,
