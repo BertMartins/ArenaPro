@@ -42,7 +42,7 @@ export default function LoginPage() {
       {/* LOGO */}
       <div className="text-center mb-10 animate-fadeIn">
         <div className="inline-block text-6xl mb-4 animate-bounceSoft">🏐</div>
-        <h1 className="title-font font-bold text-5xl text-white">VOLEIPRO</h1>
+        <h1 className="title-font font-bold text-5xl text-white">ARENA PRO</h1>
         <p className="text-gray-400 mt-1">Gestão Profissional de Jogos</p>
       </div>
 
@@ -58,7 +58,7 @@ export default function LoginPage() {
               name="email"
               type="email"
               required
-              defaultValue="admin@volei.com"
+              placeholder="Digite seu login"
               className="w-full px-4 py-3 rounded-lg bg-gray-900 text-white border border-gray-700 focus:ring focus:ring-orange-500"
             />
           </div>
@@ -70,7 +70,7 @@ export default function LoginPage() {
               name="password"
               type="password"
               required
-              defaultValue="123"
+              placeholder="Digite sua senha"
               className="w-full px-4 py-3 rounded-lg bg-gray-900 text-white border border-gray-700 focus:ring focus:ring-orange-500"
             />
           </div>
