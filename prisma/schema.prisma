@@ -7,23 +7,46 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+//
+// ==============================
+//  USER
+// ==============================
 model User {
-  id        String   @id @default(cuid())
+  id        String      @id @default(cuid())
   name      String
-  email     String   @unique
+  email     String       @unique
   password  String
-  role      String   @default("player")
-  createdAt DateTime @default(now())
+  role      UserRole     @default(player)
+  paymentType PaymentType @default(monthly)
+  level     Int          @default(1)
+  photo     String?
+  createdAt DateTime     @default(now())
 
   stats       UserStats?
-  games       Game[]       @relation("CreatedGames")
+  games       Game[]        @relation("CreatedGames")
   gamePlayers GamePlayer[]
   payments    Payment[]
-
-  // 🔥 NOVO — jogos onde o usuário foi campeão
   championGames Game[] @relation("ChampionGames")
+
+  teamPlayers GameTeamPlayer[]
+  financialEntries FinancialEntry[]
 }
 
+enum UserRole {
+  admin
+  player
+  visitor
+}
+
+enum PaymentType {
+  monthly
+  daily
+}
+
+//
+// ==============================
+//  USER STATS
+// ==============================
 model UserStats {
   id     String @id @default(cuid())
   userId String @unique
@@ -35,40 +58,137 @@ model UserStats {
   user User @relation(fields: [userId], references: [id])
 }
 
+//
+// ==============================
+//  GAME
+// ==============================
 model Game {
-  id         String   @id @default(cuid())
-  date       DateTime
-  maxPlayers Int
-  status     String   @default("open")
-  createdAt  DateTime @default(now())
+  id          String    @id @default(cuid())
+  date        DateTime
+  maxPlayers  Int
+  teamSize    Int
+  status      GameStatus  @default(open)
+  twoWinsRule Boolean     @default(true)
+  pointsPerMatch Int      @default(25)
+  cutoffTime  String      @default("15:00")
+  createdAt   DateTime    @default(now())
 
   createdById String
   createdBy   User   @relation("CreatedGames", fields: [createdById], references: [id])
 
   players GamePlayer[]
 
-  // 🔥 NOVO — campeão
-  championId String?
-  champion   User?   @relation("ChampionGames", fields: [championId], references: [id])
+  championId  String?
+  champion    User?   @relation("ChampionGames", fields: [championId], references: [id])
+
+  teams GameTeam[]
+  matches MatchHistory[]
+
+  financialEntries FinancialEntry[]
 }
 
+enum GameStatus {
+  open
+  in_progress
+  finished
+}
+
+//
+// ==============================
+//  GAME PLAYER
+// ==============================
 model GamePlayer {
-  id       String   @id @default(cuid())
-  userId   String
-  gameId   String
-  joinedAt DateTime @default(now())
+  id         String      @id @default(cuid())
+  userId     String
+  gameId     String
+  timestamp  DateTime    @default(now())
+  paymentType PaymentType @default(monthly)
 
   user User @relation(fields: [userId], references: [id])
   game Game @relation(fields: [gameId], references: [id])
 }
 
+//
+// ==============================
+//  TEAMS (TIMES GERADOS)
+// ==============================
+model GameTeam {
+  id       String   @id @default(cuid())
+  gameId   String
+  name     String
+  color    String
+
+  players GameTeamPlayer[]
+  game    Game @relation(fields: [gameId], references: [id])
+}
+
+model GameTeamPlayer {
+  id      String @id @default(cuid())
+  teamId  String
+  userId  String
+
+  team GameTeam @relation(fields: [teamId], references: [id])
+  user User     @relation(fields: [userId], references: [id])
+}
+
+//
+// ==============================
+//  MATCH HISTORY (PLACAR)
+// ==============================
+model MatchHistory {
+  id          String   @id @default(cuid())
+  gameId      String
+  matchNumber Int
+  team1Id     String
+  team2Id     String
+  score1      Int
+  score2      Int
+  winner      String
+  createdAt   DateTime @default(now())
+
+  game Game @relation(fields: [gameId], references: [id])
+}
+
+//
+// ==============================
+//  PAYMENTS (MENSALIDADE)
+// ==============================
 model Payment {
   id     String    @id @default(cuid())
   userId String
   month  Int
   year   Int
-  status String    @default("pending")
+  status PaymentStatus @default(pending)
   paidAt DateTime?
 
   user User @relation(fields: [userId], references: [id])
+}
+
+enum PaymentStatus {
+  pending
+  paid
+}
+
+//
+// ==============================
+//  FINANCIAL (CAIXINHA)
+// ==============================
+model FinancialEntry {
+  id        String   @id @default(cuid())
+  date      DateTime
+  type      FinancialType
+  gameId    String?
+  userId    String?
+  amount    Float
+  note      String?
+
+  game Game? @relation(fields: [gameId], references: [id])
+  user User? @relation(fields: [userId], references: [id])
+}
+
+enum FinancialType {
+  daily_fee      // visitantes / diaristas
+  arena_payment  // valor pago na quadra
+  adjustment     // correção manual
+  monthly_income // mensalistas (opcional)
 }
