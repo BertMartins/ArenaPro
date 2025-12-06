@@ -37,52 +37,67 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen px-4">
-      <div className="text-center mb-8">
-        <div className="inline-block text-6xl mb-4">🏐</div>
-        <h1 className="font-bold text-5xl">VOLEIPRO</h1>
-        <p className="text-gray-400">Gestão Profissional de Jogos</p>
+    <div className="flex flex-col items-center justify-center min-h-screen px-6 page-animate">
+
+      {/* LOGO */}
+      <div className="text-center mb-10 animate-fadeIn">
+        <div className="inline-block text-6xl mb-4 animate-bounceSoft">🏐</div>
+        <h1 className="title-font font-bold text-5xl text-white">VOLEIPRO</h1>
+        <p className="text-gray-400 mt-1">Gestão Profissional de Jogos</p>
       </div>
 
-      <div className="bg-white/10 p-6 rounded-xl w-full max-w-md border border-white/20">
+      {/* CARD */}
+      <div className="glass-card p-8 rounded-2xl w-full max-w-md animate-slideIn">
+
         <form className="space-y-6" onSubmit={handleLogin}>
+
+          {/* EMAIL */}
           <div>
-            <label className="block text-gray-300 mb-2">Email</label>
+            <label className="block text-gray-300 mb-2 font-medium">Email</label>
             <input
               name="email"
               type="email"
               required
               defaultValue="admin@volei.com"
-              className="w-full px-4 py-3 rounded-lg bg-gray-900 text-white border border-gray-700"
+              className="w-full px-4 py-3 rounded-lg bg-gray-900 text-white border border-gray-700 focus:ring focus:ring-orange-500"
             />
           </div>
 
+          {/* SENHA */}
           <div>
-            <label className="block text-gray-300 mb-2">Senha</label>
+            <label className="block text-gray-300 mb-2 font-medium">Senha</label>
             <input
               name="password"
               type="password"
               required
               defaultValue="123"
-              className="w-full px-4 py-3 rounded-lg bg-gray-900 text-white border border-gray-700"
+              className="w-full px-4 py-3 rounded-lg bg-gray-900 text-white border border-gray-700 focus:ring focus:ring-orange-500"
             />
           </div>
 
+          {/* BOTÃO */}
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-lg"
+            className="btn-primary w-full py-3 rounded-lg text-white font-bold text-lg"
           >
             {loading ? "Entrando..." : "ENTRAR"}
           </button>
         </form>
 
-        <div className="mt-4 text-center">
-          <a href="/register" className="text-orange-400 text-sm">Cadastre-se</a>
+        {/* LINKS */}
+        <div className="mt-6 text-center">
+          <a href="/register" className="text-orange-400 hover:text-orange-300 font-medium">
+            Não tem conta? Cadastre-se
+          </a>
         </div>
+
         <div className="mt-2 text-center">
-          <a href="/forgot-password" className="text-gray-400 text-sm">Esqueceu a senha?</a>
+          <a href="/forgot-password" className="text-gray-400 hover:text-gray-200 text-sm">
+            Esqueceu sua senha?
+          </a>
         </div>
+
       </div>
     </div>
   );

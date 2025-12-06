@@ -4,18 +4,54 @@
 @tailwind components;
 @tailwind utilities;
 
-/* fundo padrão */
+/* Tema */
+:root {
+  --background: #0F172A;
+  --foreground: #ffffff;
+}
+
 body {
-  background: #0F172A;
-  color: white;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
 }
 
-/* animação de slide dos toast */
-@keyframes slideIn {
-  0% { opacity: 0; transform: translateX(20px); }
-  100% { opacity: 1; transform: translateX(0); }
+/* Fonte título (igual ao index.html) */
+.title-font {
+  font-family: 'Poppins', sans-serif;
 }
 
-.animate-slideIn {
-  animation: slideIn 0.3s ease-out;
+/* Efeito Glass */
+.glass-card {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Botão primário */
+.btn-primary {
+  background: linear-gradient(90deg, #F97316, #fb923c);
+  transition: 0.2s ease;
+}
+
+.btn-primary:hover {
+  filter: brightness(1.15);
+  transform: scale(1.02);
+}
+
+/* Entradas */
+input {
+  transition: 0.2s ease;
+}
+
+input:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.4);
+}
+
+/* animação inicial das telas */
+.page-animate {
+  animation: fadeIn .5s ease-out forwards;
 }
