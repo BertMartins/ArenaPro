@@ -1,0 +1,74 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      String   @default("player")
+  createdAt DateTime @default(now())
+
+  stats       UserStats?
+  games       Game[]       @relation("CreatedGames")
+  gamePlayers GamePlayer[]
+  payments    Payment[]
+
+  // 🔥 NOVO — jogos onde o usuário foi campeão
+  championGames Game[] @relation("ChampionGames")
+}
+
+model UserStats {
+  id     String @id @default(cuid())
+  userId String @unique
+  wins   Int    @default(0)
+  losses Int    @default(0)
+  level  Int    @default(1)
+  titles Int    @default(0)
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Game {
+  id         String   @id @default(cuid())
+  date       DateTime
+  maxPlayers Int
+  status     String   @default("open")
+  createdAt  DateTime @default(now())
+
+  createdById String
+  createdBy   User   @relation("CreatedGames", fields: [createdById], references: [id])
+
+  players GamePlayer[]
+
+  // 🔥 NOVO — campeão
+  championId String?
+  champion   User?   @relation("ChampionGames", fields: [championId], references: [id])
+}
+
+model GamePlayer {
+  id       String   @id @default(cuid())
+  userId   String
+  gameId   String
+  joinedAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+  game Game @relation(fields: [gameId], references: [id])
+}
+
+model Payment {
+  id     String    @id @default(cuid())
+  userId String
+  month  Int
+  year   Int
+  status String    @default("pending")
+  paidAt DateTime?
+
+  user User @relation(fields: [userId], references: [id])
+}
