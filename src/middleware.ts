@@ -1,50 +1,59 @@
-import { NextResponse } from "next/server";
-import { jwtVerify } from "jose";
+import { NextRequest, NextResponse } from "next/server";
+import { verifyToken, AuthToken } from "@/lib/jwt";
 
-const SECRET = new TextEncoder().encode(process.env.JWT_SECRET!);
+const PUBLIC_ROUTES = [
+  "/login",
+  "/register",
+  "/api/auth/login",
+  "/api/auth/register",
+];
 
-export async function middleware(req: any) {
-  const token = req.cookies.get("volei_token")?.value;
+export function middleware(req: NextRequest) {
+  const { pathname } = req.nextUrl;
 
-  const url = req.nextUrl.pathname;
-
-  // 🔓 Rotas públicas
-  if (
-    url.startsWith("/login") ||
-    url.startsWith("/register") ||
-    url.startsWith("/forgot-password") ||
-    url.startsWith("/api/auth")
-  ) {
+  // ✅ Libera rotas públicas
+  if (PUBLIC_ROUTES.some((route) => pathname.startsWith(route))) {
     return NextResponse.next();
   }
 
-  if (!token) {
+  // 📌 Pega token do header
+  const authHeader = req.headers.get("authorization");
+  if (!authHeader) {
     return NextResponse.redirect(new URL("/login", req.url));
   }
 
-  try {
-    const { payload } = await jwtVerify(token, SECRET);
+  const token = authHeader.replace("Bearer ", "");
+  const decoded = verifyToken(token) as AuthToken | null;
 
-    // 🔥 Proteção de rotas ADMIN
-    if (url.startsWith("/dashboard") && payload.role !== "admin") {
-      return NextResponse.redirect(new URL("/player", req.url));
-    }
-
-    // 🔥 Proteção de rota PLAYER
-    if (url.startsWith("/player") && payload.role === "admin") {
-      return NextResponse.redirect(new URL("/dashboard", req.url));
-    }
-
-    return NextResponse.next();
-  } catch (err) {
-    console.log("Invalid Token:", err);
+  // ❌ Token inválido
+  if (!decoded) {
     return NextResponse.redirect(new URL("/login", req.url));
   }
+
+  // 🔥 Proteção do painel ADMIN
+  if (pathname.startsWith("/dashboard") && decoded.role !== "admin") {
+    return NextResponse.json(
+      { error: "Acesso negado. Apenas admins podem acessar." },
+      { status: 403 }
+    );
+  }
+
+  // 🔥 Proteção do painel PLAYER
+  if (pathname.startsWith("/player") && decoded.role !== "player") {
+    return NextResponse.json(
+      { error: "Apenas jogadores podem acessar." },
+      { status: 403 }
+    );
+  }
+
+  // Token OK → segue viagem
+  return NextResponse.next();
 }
 
 export const config = {
   matcher: [
-    "/dashboard/:path*",
-    "/player/:path*",
+    "/dashboard/:path*", // rotas admin
+    "/player/:path*", // rotas player
+    "/api/:path*", // protege APIs também
   ],
 };

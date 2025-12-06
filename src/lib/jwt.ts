@@ -1,14 +1,14 @@
-import jwt from "jsonwebtoken";
+import jwt, { JwtPayload } from "jsonwebtoken";
 
-const SECRET = process.env.JWT_SECRET!;
-
-export function signToken(payload: any) {
-  return jwt.sign(payload, SECRET, { expiresIn: "7d" });
+export interface AuthToken extends JwtPayload {
+  id: string;
+  role: string;
 }
 
-export function verifyToken(token: string) {
+export function verifyToken(token: string): AuthToken | null {
   try {
-    return jwt.verify(token, SECRET);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as AuthToken;
+    return decoded;
   } catch (err) {
     return null;
   }
