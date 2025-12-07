@@ -4,6 +4,11 @@ import { ToastProvider } from "@/components/ui/ToastProvider";
 export const metadata = {
   title: "Arenapro",
   description: "Sistema de Gestão de Jogos",
+  
+  icons: {
+    icon: "/logo.png",    
+    apple: "/logo.png",        
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
