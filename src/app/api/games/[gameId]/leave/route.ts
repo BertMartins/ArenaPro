@@ -2,13 +2,25 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { verifyToken } from "@/lib/jwt";
 
-export async function POST(_: Request, { params }: { params: { gameId: string } }) {
-  const token = await verifyToken();
-  if (!token) return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
+export async function POST(
+  req: Request,
+  context: { params: Promise<{ gameId: string }> }
+) {
+  try {
+    const { gameId } = await context.params;
 
-  await prisma.gamePlayer.deleteMany({
-    where: { userId: token.id, gameId: params.gameId },
-  });
+    const user = await verifyToken();
+    if (!user) {
+      return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
+    }
 
-  return NextResponse.json({ ok: true });
+    await prisma.gamePlayer.deleteMany({
+      where: { gameId, userId: user.id },
+    });
+
+    return NextResponse.json({ ok: true });
+  } catch (err) {
+    console.error("Erro leave:", err);
+    return NextResponse.json({ error: "Erro interno" }, { status: 500 });
+  }
 }

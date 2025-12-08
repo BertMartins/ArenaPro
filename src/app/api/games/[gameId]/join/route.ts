@@ -2,27 +2,34 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { verifyToken } from "@/lib/jwt";
 
-export async function POST(_: Request, { params }: { params: { gameId: string } }) {
-  const token = await verifyToken();
-  if (!token) return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
+export async function POST(
+  req: Request,
+  context: { params: Promise<{ gameId: string }> }
+) {
+  try {
+    const { gameId } = await context.params;
 
-  const game = await prisma.game.findUnique({
-    where: { id: params.gameId },
-    include: { players: true },
-  });
+    const user = await verifyToken();
+    if (!user) {
+      return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
+    }
 
-  if (!game) return NextResponse.json({ error: "Jogo não encontrado" }, { status: 404 });
+    const game = await prisma.game.findUnique({ where: { id: gameId } });
+    if (!game) {
+      return NextResponse.json({ error: "Jogo não encontrado" }, { status: 404 });
+    }
 
-  if (game.players.length >= game.maxPlayers)
-    return NextResponse.json({ error: "Jogo lotado" }, { status: 400 });
+    await prisma.gamePlayer.create({
+      data: {
+        gameId,
+        userId: user.id,
+        paymentType: user.role === "visitor" ? "daily" : "monthly",
+      },
+    });
 
-  await prisma.gamePlayer.create({
-    data: {
-      userId: token.id,
-      gameId: params.gameId,
-      paymentType: "monthly",
-    },
-  });
-
-  return NextResponse.json({ ok: true });
+    return NextResponse.json({ ok: true });
+  } catch (err) {
+    console.error("Erro join:", err);
+    return NextResponse.json({ error: "Erro interno" }, { status: 500 });
+  }
 }
