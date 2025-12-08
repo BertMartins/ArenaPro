@@ -1,17 +1,33 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { verifyToken } from "@/lib/jwt";
 
 export async function POST(
-  req: Request,
+  request: NextRequest,
   context: { params: Promise<{ gameId: string }> }
 ) {
   try {
     const { gameId } = await context.params;
 
-    const user = await verifyToken();
-    if (!user || user.role !== "admin") {
-      return NextResponse.json({ error: "Acesso negado" }, { status: 401 });
+    const token = await verifyToken();
+    if (!token || token.role !== "admin") {
+      return NextResponse.json(
+        { error: "Apenas admins podem finalizar" },
+        { status: 401 }
+      );
+    }
+
+    const game = await prisma.game.findUnique({ where: { id: gameId } });
+
+    if (!game) {
+      return NextResponse.json({ error: "Jogo não encontrado" }, { status: 404 });
+    }
+
+    if (game.status === "finished") {
+      return NextResponse.json(
+        { error: "Jogo já está finalizado" },
+        { status: 400 }
+      );
     }
 
     await prisma.game.update({
@@ -21,7 +37,10 @@ export async function POST(
 
     return NextResponse.json({ ok: true });
   } catch (err) {
-    console.error("Erro finish:", err);
-    return NextResponse.json({ error: "Erro interno" }, { status: 500 });
+    console.error("[FINISH]", err);
+    return NextResponse.json(
+      { error: "Erro ao finalizar jogo" },
+      { status: 500 }
+    );
   }
 }

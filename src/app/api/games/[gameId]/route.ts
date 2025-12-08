@@ -1,35 +1,32 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { verifyToken } from "@/lib/jwt";
 
-// GET — detalhes do jogo
 export async function GET(
-  req: Request,
+  request: NextRequest,
   context: { params: Promise<{ gameId: string }> }
 ) {
   try {
     const { gameId } = await context.params;
 
-    const user = await verifyToken();
-    if (!user) {
+    const token = await verifyToken();
+    if (!token) {
       return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
     }
 
     const game = await prisma.game.findUnique({
       where: { id: gameId },
       include: {
-        players: {
-          include: {
-            user: true
-          }
-        },
+        players: { include: { user: true } },
         teams: {
           include: {
-            players: { include: { user: true } }
-          }
+            players: {
+              include: { user: true },
+            },
+          },
         },
-        matches: true
-      }
+        matches: true,
+      },
     });
 
     if (!game) {
@@ -38,7 +35,10 @@ export async function GET(
 
     return NextResponse.json({ game });
   } catch (err) {
-    console.error("Erro GET gameId:", err);
-    return NextResponse.json({ error: "Erro interno" }, { status: 500 });
+    console.error("[GET GAME]", err);
+    return NextResponse.json(
+      { error: "Erro interno ao carregar jogo" },
+      { status: 500 }
+    );
   }
 }

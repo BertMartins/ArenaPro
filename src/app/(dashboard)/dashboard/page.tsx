@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import StatsHeader from "@/components/dashboard/StatsHeader";
 import AdminActionsBar from "@/components/dashboard/AdminActionsBar";
 import CreateGameModal from "@/components/dashboard/CreateGameModal";
-import GameCardAdmin from "@/components/dashboard/GameCardAdmin";
+import GameCard from "@/components/dashboard/GameCard";
 import BottomNav from "@/components/dashboard/BottomNav";
 
 type Game = any;
@@ -13,6 +14,8 @@ export default function DashboardAdminPage() {
   const [games, setGames] = useState<Game[]>([]);
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
+
+  const router = useRouter(); // <-- agora existe
 
   async function loadGames() {
     setLoading(true);
@@ -62,7 +65,14 @@ export default function DashboardAdminPage() {
 
         <div className="space-y-4">
           {games.map((g) => (
-            <GameCardAdmin key={g.id} game={g} onUpdate={loadGames} />
+            <GameCard
+              key={g.id}
+              game={g}
+              currentUserId="" 
+              mode="player"
+              onView={() => router.push(`/games/${g.id}`)}
+              refresh={loadGames}
+            />
           ))}
         </div>
       </section>

@@ -1,23 +1,27 @@
 "use client";
 
-export default function BottomNav({ active }: { active?: "home" | "games" | "play" | "stats" }) {
+export default function BottomNav({ active }: any) {
+  const items = [
+    { id: "home", label: "Início", icon: "🏠", href: "/" },
+    { id: "games", label: "Jogos", icon: "📅", href: "/games" },
+    { id: "play", label: "Play", icon: "▶️", href: "/play" },
+    { id: "stats", label: "Stats", icon: "📊", href: "/stats" },
+  ];
+
   return (
-    <nav className="fixed bottom-4 left-1/2 transform -translate-x-1/2 w-[calc(100%-48px)] max-w-4xl bg-neutral-900/80 backdrop-blur rounded-xl p-3 flex justify-around items-center shadow-lg">
-      <a className={`flex-1 py-3 rounded-lg text-center ${active === "home" ? "bg-gradient-to-r from-orange-500 to-orange-400 text-white font-bold" : "text-gray-300"}`} href="#">
-        🏠<div className="text-xs">Início</div>
-      </a>
-
-      <a className={`flex-1 py-3 rounded-lg text-center ${active === "games" ? "bg-gradient-to-r from-orange-500 to-orange-400 text-white font-bold" : "text-gray-300"}`} href="/player/games">
-        📅<div className="text-xs">Jogos</div>
-      </a>
-
-      <a className={`flex-1 py-3 rounded-lg text-center ${active === "play" ? "bg-gradient-to-r from-orange-500 to-orange-400 text-white font-bold" : "text-gray-300"}`} href="/player/play">
-        ▶️<div className="text-xs">Play</div>
-      </a>
-
-      <a className={`flex-1 py-3 rounded-lg text-center ${active === "stats" ? "bg-gradient-to-r from-orange-500 to-orange-400 text-white font-bold" : "text-gray-300"}`} href="/player/stats">
-        📊<div className="text-xs">Stats</div>
-      </a>
+    <nav className="fixed bottom-0 left-0 right-0 bg-[#0f131a] border-t border-white/10 h-20 flex justify-around items-center">
+      {items.map((i) => (
+        <a
+          key={i.id}
+          href={i.href}
+          className={`flex flex-col items-center text-sm ${
+            active === i.id ? "text-orange-400" : "text-gray-400"
+          }`}
+        >
+          <span className="text-2xl">{i.icon}</span>
+          {i.label}
+        </a>
+      ))}
     </nav>
   );
 }

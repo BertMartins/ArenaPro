@@ -1,6 +1,10 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+
 export default function AdminActionsBar({ onCreate }: { onCreate: () => void }) {
+  const router = useRouter();
+
   return (
     <div className="space-y-4">
       <div>
@@ -13,9 +17,26 @@ export default function AdminActionsBar({ onCreate }: { onCreate: () => void }) 
       </div>
 
       <div className="grid grid-cols-3 gap-4">
-        <button className="py-3 rounded-xl bg-blue-500 text-white font-bold">👥 USUÁRIOS</button>
-        <button className="py-3 rounded-xl bg-green-600 text-white font-bold">💳 MENSALIDADES</button>
-        <button className="py-3 rounded-xl bg-purple-600 text-white font-bold">📈 CONTROLE FINANCEIRO</button>
+        <button
+          className="py-3 rounded-xl bg-blue-500 text-white font-bold"
+          onClick={() => router.push("/dashboard/users")}
+        >
+          👥 USUÁRIOS
+        </button>
+
+        <button
+          className="py-3 rounded-xl bg-green-600 text-white font-bold"
+          onClick={() => router.push("/dashboard/mensalistas")}
+        >
+          💳 MENSALISTA
+        </button>
+
+        <button
+          className="py-3 rounded-xl bg-purple-600 text-white font-bold"
+          onClick={() => router.push("/dashboard/financeiro")}
+        >
+          📈 CONTROLE FINANCEIRO
+        </button>
       </div>
     </div>
   );

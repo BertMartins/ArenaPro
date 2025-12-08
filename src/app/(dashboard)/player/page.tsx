@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import PlayerHeader from "@/components/dashboard/PlayerHeader";
-import GameCardPlayer from "@/components/dashboard/GameCardPlayer";
+import GameCard from "@/components/dashboard/GameCard";
 import BottomNav from "@/components/dashboard/BottomNav";
 
 type Game = any;
@@ -11,6 +12,8 @@ export default function PlayerDashboard() {
   const [games, setGames] = useState<Game[]>([]);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
+
+  const router = useRouter(); // <-- Faltava isso!
 
   async function loadUser() {
     try {
@@ -70,7 +73,14 @@ export default function PlayerDashboard() {
 
         <div className="space-y-4">
           {games.map((g) => (
-            <GameCardPlayer key={g.id} game={g} userId={user?.id} onUpdate={loadGames} />
+            <GameCard
+              key={g.id}
+              game={g}
+              currentUserId=""
+              mode="player"
+              onView={() => router.push(`/games/${g.id}`)}
+              refresh={loadGames}
+            />
           ))}
         </div>
       </section>

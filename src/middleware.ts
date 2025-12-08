@@ -1,25 +1,34 @@
 import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 import { verifyToken } from "@/lib/jwt";
 
-export async function middleware(req: Request) {
-  const url = new URL(req.url);
-  const pathname = url.pathname;
+export async function middleware(req: NextRequest) {
+  const pathname = req.nextUrl.pathname;
 
-  const user = await verifyToken();
-
-  // Player não pode acessar /dashboard
-  if (pathname.startsWith("/dashboard")) {
-    if (!user || user.role !== "admin") {
-      return NextResponse.redirect(new URL("/player", req.url));
-    }
+  // rotas públicas
+  if (
+    pathname.startsWith("/login") ||
+    pathname.startsWith("/register") ||
+    pathname.startsWith("/api/auth")
+  ) {
+    return NextResponse.next();
   }
 
-  // Admin não pode acessar /player
-  if (pathname.startsWith("/player")) {
-    if (!user || user.role !== "player") {
-      return NextResponse.redirect(new URL("/dashboard", req.url));
-    }
+  // valida token
+  const user = await verifyToken(); // ← AQUI é o conserto
+
+  if (!user) {
+    return NextResponse.redirect(new URL("/login", req.url));
+  }
+
+  // player tentando acessar área admin
+  if (pathname.startsWith("/dashboard") && user.role !== "admin") {
+    return NextResponse.redirect(new URL("/player", req.url));
   }
 
   return NextResponse.next();
 }
+
+export const config = {
+  matcher: ["/dashboard/:path*", "/player/:path*", "/api/:path*"],
+};
