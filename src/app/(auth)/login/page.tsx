@@ -24,6 +24,7 @@ export default function LoginPage() {
     if (res.ok) {
       toast("Login realizado!", "success");
 
+      // redirecionamento baseado no papel salvo no token
       if (data.user.role === "admin") {
         window.location.href = "/dashboard";
       } else {

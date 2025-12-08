@@ -1,59 +1,41 @@
 import { NextRequest, NextResponse } from "next/server";
-import { verifyToken, AuthToken } from "@/lib/jwt";
+import { verifyToken } from "@/lib/jwt";
 
-const PUBLIC_ROUTES = [
-  "/login",
-  "/register",
-  "/api/auth/login",
-  "/api/auth/register",
-];
+export const config = {
+  matcher: ["/dashboard/:path*", "/player/:path*"],
+};
 
-export function middleware(req: NextRequest) {
-  const { pathname } = req.nextUrl;
+export async function middleware(req: NextRequest) {
+  const token = req.cookies.get("token")?.value;
+  const pathname = req.nextUrl.pathname;
 
-  // ✅ Libera rotas públicas
-  if (PUBLIC_ROUTES.some((route) => pathname.startsWith(route))) {
+  // Rotas públicas que não exigem login
+  const PUBLIC = ["/login", "/register"];
+
+  if (PUBLIC.some((p) => pathname.startsWith(p))) {
     return NextResponse.next();
   }
 
-  // 📌 Pega token do header
-  const authHeader = req.headers.get("authorization");
-  if (!authHeader) {
+  // Sem token → login
+  if (!token) {
     return NextResponse.redirect(new URL("/login", req.url));
   }
 
-  const token = authHeader.replace("Bearer ", "");
-  const decoded = verifyToken(token) as AuthToken | null;
+  try {
+    const user = await verifyToken(token);
 
-  // ❌ Token inválido
-  if (!decoded) {
+    // Player não pode ver /dashboard
+    if (pathname.startsWith("/dashboard") && user.role !== "admin") {
+      return NextResponse.redirect(new URL("/player", req.url));
+    }
+
+    // Admin não pode ver /player
+    if (pathname.startsWith("/player") && user.role !== "player") {
+      return NextResponse.redirect(new URL("/dashboard", req.url));
+    }
+
+    return NextResponse.next();
+  } catch (e) {
     return NextResponse.redirect(new URL("/login", req.url));
   }
-
-  // 🔥 Proteção do painel ADMIN
-  if (pathname.startsWith("/dashboard") && decoded.role !== "admin") {
-    return NextResponse.json(
-      { error: "Acesso negado. Apenas admins podem acessar." },
-      { status: 403 }
-    );
-  }
-
-  // 🔥 Proteção do painel PLAYER
-  if (pathname.startsWith("/player") && decoded.role !== "player") {
-    return NextResponse.json(
-      { error: "Apenas jogadores podem acessar." },
-      { status: 403 }
-    );
-  }
-
-  // Token OK → segue viagem
-  return NextResponse.next();
 }
-
-export const config = {
-  matcher: [
-    "/dashboard/:path*", // rotas admin
-    "/player/:path*", // rotas player
-    "/api/:path*", // protege APIs também
-  ],
-};
