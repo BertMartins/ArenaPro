@@ -1,6 +1,6 @@
 "use client";
 
-export default function GameCardAdmin({ game, onUpdate }: { game: any; onUpdate: () => void; }) {
+export default function GameCardAdmin({ game, onUpdate }: { game: any; onUpdate: () => void }) {
   async function handleJoin() {
     const res = await fetch(`/api/games/${game.id}/join`, { method: "POST" });
     const data = await res.json();
@@ -10,7 +10,7 @@ export default function GameCardAdmin({ game, onUpdate }: { game: any; onUpdate:
   }
 
   async function handleFinish() {
-    if (!confirm("Finalizar jogo?")) return;
+    if (!confirm("Finalizar este jogo?")) return;
     const res = await fetch(`/api/games/${game.id}/finish`, { method: "POST" });
     if (res.ok) {
       alert("Jogo finalizado");

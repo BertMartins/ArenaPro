@@ -1,42 +1,105 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
+
+interface AdminStats {
+  name: string;
+  titles: number;
+  level: number;
+  wins: number;
+  rate: number;
+}
 
 export default function StatsHeader() {
-  // Se quiser, aqui buscaria /api/admin/stats; por enquanto placeholders (ou você substitui por fetch)
-  const level = 5;
-  const wins = 45;
-  const rate = 66;
+  const [stats, setStats] = useState<AdminStats | null>(null);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await fetch("/api/admin/stats", { cache: "no-store" });
+        const data = await res.json();
+        if (res.ok) setStats(data);
+      } catch (e) {
+        console.error("Erro ao carregar stats:", e);
+      }
+    })();
+  }, []);
+
+  if (!stats) {
+    return (
+      <header className="rounded-xl overflow-hidden">
+        <div
+          className="p-6 text-white"
+          style={{ background: "linear-gradient(90deg, #ff7a18, #ff9e32)" }}
+        >
+          <div className="text-center">Carregando...</div>
+        </div>
+      </header>
+    );
+  }
 
   return (
     <header className="rounded-xl overflow-hidden">
-      <div className="bg-gradient-to-r from-orange-500 to-orange-400 p-6 rounded-xl text-white">
-        <div className="flex items-center justify-between mb-4">
+      <div
+        className="p-6 text-white"
+        style={{ background: "linear-gradient(90deg, #ff7a18, #ff9e32)" }}
+      >
+        {/* TOPO */}
+        <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-md bg-white/10 flex items-center justify-center text-2xl">👤</div>
+            <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-2xl">
+              👤
+            </div>
+
             <div>
-              <div className="font-bold text-lg">Admin</div>
-              <div className="text-sm text-orange-100">🏆 5 Títulos</div>
+              <div className="font-bold text-lg">{stats.name}</div>
+              <div className="text-sm text-white/80">
+                🏆 {stats.titles} Títulos
+              </div>
             </div>
           </div>
 
-          <div className="text-white/90"> {/* action icon */}
-            <button title="logout" className="p-2 rounded bg-white/10">⤴️</button>
-          </div>
+          <button
+            className="text-white text-xl bg-white/20 hover:bg-white/30 p-2 rounded-lg transition"
+            title="logout"
+            onClick={async () => {
+             await fetch("/api/auth/logout", { method: "POST" });
+             window.location.href = "/login";
+           }}>
+            <i className="fas fa-sign-out-alt text-xl"></i>
+          </button>
+
         </div>
 
+        {/* CARDS */}
         <div className="grid grid-cols-3 gap-4">
-          <div className="glass-card p-4 rounded-md bg-white/10">
-            <div className="text-xl font-bold text-center text-orange-50">{level}</div>
-            <div className="text-xs text-center text-white/80 mt-2">Nível</div>
+          {/* NÍVEL */}
+          <div
+            className="rounded-xl flex flex-col justify-center items-center py-6"
+            style={{ background: "rgba(255,255,255,0.08)" }}
+          >
+            <div className="text-3xl font-bold text-purple-300 bg-purple-800/30 w-12 h-12 rounded-full flex items-center justify-center">
+              {stats.level}
+            </div>
+            <span className="mt-2 text-sm text-white/90">Nível</span>
           </div>
-          <div className="glass-card p-4 rounded-md bg-white/10">
-            <div className="text-xl font-bold text-center text-orange-50">{wins}</div>
-            <div className="text-xs text-center text-white/80 mt-2">Vitórias</div>
+
+          {/* VITÓRIAS */}
+          <div
+            className="rounded-xl flex flex-col justify-center items-center py-6"
+            style={{ background: "rgba(255,255,255,0.08)" }}
+          >
+            <div className="text-3xl font-bold">{stats.wins}</div>
+            <span className="mt-2 text-sm text-white/90">Vitórias</span>
           </div>
-          <div className="glass-card p-4 rounded-md bg-white/10">
-            <div className="text-xl font-bold text-center text-orange-50">{rate}%</div>
-            <div className="text-xs text-center text-white/80 mt-2">Taxa</div>
+
+          {/* TAXA */}
+          <div
+            className="rounded-xl flex flex-col justify-center items-center py-6"
+            style={{ background: "rgba(255,255,255,0.08)" }}
+          >
+            <div className="text-3xl font-bold">{stats.rate}%</div>
+            <span className="mt-2 text-sm text-white/90">Taxa</span>
           </div>
         </div>
       </div>

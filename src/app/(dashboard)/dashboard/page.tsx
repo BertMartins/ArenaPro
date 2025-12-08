@@ -2,20 +2,12 @@
 
 import { useEffect, useState } from "react";
 import StatsHeader from "@/components/dashboard/StatsHeader";
-import CreateGameModal from "@/components/dashboard/CreateGameModal";
 import AdminActionsBar from "@/components/dashboard/AdminActionsBar";
+import CreateGameModal from "@/components/dashboard/CreateGameModal";
 import GameCardAdmin from "@/components/dashboard/GameCardAdmin";
+import BottomNav from "@/components/dashboard/BottomNav";
 
-type Game = {
-  id: string;
-  date: string;
-  maxPlayers: number;
-  teamSize: number;
-  pointsPerMatch: number;
-  twoWinsRule: boolean;
-  status: string;
-  players: { id: string; userId: string }[];
-};
+type Game = any;
 
 export default function DashboardAdminPage() {
   const [games, setGames] = useState<Game[]>([]);
@@ -27,17 +19,15 @@ export default function DashboardAdminPage() {
     try {
       const res = await fetch("/api/games");
       const data = await res.json();
-      if (res.ok && data.games) {
-        // filtrar hoje + futuros
+      if (res.ok) {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
-        const filtered = data.games.filter((g: Game) => {
+        const filtered = data.filter((g: Game) => {
           const d = new Date(g.date);
           d.setHours(0, 0, 0, 0);
           return d >= today;
         });
-        // ordenar asc
-        filtered.sort((a: Game, b: Game) => new Date(a.date).getTime() - new Date(b.date).getTime());
+        filtered.sort((a: Game, b: Game) => +new Date(a.date) - +new Date(b.date));
         setGames(filtered);
       } else {
         setGames([]);
@@ -57,7 +47,6 @@ export default function DashboardAdminPage() {
   return (
     <div className="p-6 space-y-6">
       <StatsHeader />
-
       <AdminActionsBar onCreate={() => setModalOpen(true)} />
 
       <section>
@@ -68,7 +57,7 @@ export default function DashboardAdminPage() {
         {loading && <div className="text-gray-400">Carregando jogos...</div>}
 
         {!loading && games.length === 0 && (
-          <div className="text-gray-400 glass-card p-6 rounded">Nenhum jogo encontrado.</div>
+          <div className="glass-card p-6 rounded">Nenhum jogo encontrado.</div>
         )}
 
         <div className="space-y-4">
@@ -78,7 +67,13 @@ export default function DashboardAdminPage() {
         </div>
       </section>
 
-      <CreateGameModal open={modalOpen} onClose={() => setModalOpen(false)} onCreated={() => { setModalOpen(false); loadGames(); }} />
+      <CreateGameModal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        onCreated={() => { setModalOpen(false); loadGames(); }}
+      />
+
+      <BottomNav active="home" />
     </div>
   );
 }

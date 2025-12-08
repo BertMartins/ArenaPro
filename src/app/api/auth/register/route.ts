@@ -6,28 +6,23 @@ export async function POST(req: Request) {
   try {
     const { name, email, password } = await req.json();
 
-    if (!name || !email || !password) {
-      return NextResponse.json({ error: "Campos obrigatórios faltando" }, { status: 400 });
-    }
+    const exists = await prisma.user.findUnique({ where: { email } });
+    if (exists) return NextResponse.json({ error: "Email já cadastrado" }, { status: 400 });
 
-    const emailExists = await prisma.user.findUnique({ where: { email } });
-
-    if (emailExists) {
-      return NextResponse.json({ error: "Email já registrado" }, { status: 400 });
-    }
-
-    const hash = await bcrypt.hash(password, 10);
+    const hashed = await bcrypt.hash(password, 10);
 
     const user = await prisma.user.create({
-      data: { name, email, password: hash },
+      data: {
+        name,
+        email,
+        password: hashed,
+        role: "player",
+        stats: { create: {} },
+      },
     });
 
-    return NextResponse.json({
-      message: "Usuário criado com sucesso",
-      user: { id: user.id, name: user.name, email: user.email },
-    });
-  } catch (error) {
-    console.error(error);
+    return NextResponse.json({ ok: true, user });
+  } catch {
     return NextResponse.json({ error: "Erro interno" }, { status: 500 });
   }
 }

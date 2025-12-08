@@ -2,37 +2,47 @@
 
 import { useState } from "react";
 
-export default function CreateGameModal({ open, onClose, onCreated }: { open: boolean; onClose: () => void; onCreated: () => void; }) {
+export default function CreateGameModal({
+  open,
+  onClose,
+  onCreated,
+}: {
+  open: boolean;
+  onClose: () => void;
+  onCreated: () => void;
+}) {
   const [loading, setLoading] = useState(false);
-
   if (!open) return null;
 
   async function handleCreate(e: any) {
     e.preventDefault();
     setLoading(true);
+    try {
+      const form = e.target;
+      const payload = {
+        date: form.date.value,
+        maxPlayers: Number(form.maxPlayers.value),
+        teamSize: Number(form.teamSize.value),
+        pointsPerMatch: Number(form.pointsPerMatch.value),
+        twoWinsRule: form.twoWinsRule.checked,
+      };
 
-    const form = e.target;
-    const payload = {
-      date: form.date.value,
-      maxPlayers: Number(form.maxPlayers.value),
-      teamSize: Number(form.teamSize.value),
-      pointsPerMatch: Number(form.pointsPerMatch.value),
-      twoWinsRule: form.twoWinsRule.checked,
-    };
-
-    const res = await fetch("/api/games", {
-      method: "POST",
-      body: JSON.stringify(payload),
-    });
-
-    const data = await res.json();
-    if (!res.ok) {
-      alert(data.error || "Erro ao criar jogo");
-    } else {
-      onCreated();
+      const res = await fetch("/api/games", {
+        method: "POST",
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        alert(data.error || "Erro ao criar jogo");
+      } else {
+        onCreated();
+      }
+    } catch (e) {
+      console.error(e);
+      alert("Erro interno");
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   }
 
   return (
@@ -44,17 +54,19 @@ export default function CreateGameModal({ open, onClose, onCreated }: { open: bo
         <form onSubmit={handleCreate} className="space-y-4">
           <div>
             <label className="text-sm text-gray-300">Data do Jogo</label>
-            <input name="date" type="date" required className="w-full p-2 rounded bg-gray-800 text-white" min={new Date().toISOString().split("T")[0]} />
+            <input name="date" type="date" required className="w-full p-2 rounded bg-gray-800 text-white"
+              min={new Date().toISOString().split("T")[0]} />
           </div>
 
           <div>
             <label className="text-sm text-gray-300">Máximo de Jogadores</label>
-            <input name="maxPlayers" type="number" required min={2} defaultValue={16} className="w-full p-2 rounded bg-gray-800 text-white" />
+            <input name="maxPlayers" type="number" required min={2} defaultValue={16}
+              className="w-full p-2 rounded bg-gray-800 text-white" />
           </div>
 
           <div>
             <label className="text-sm text-gray-300">Jogadores por Time</label>
-            <select name="teamSize" className="w-full p-2 rounded bg-gray-800 text-white" defaultValue="2">
+            <select name="teamSize" defaultValue="2" className="w-full p-2 rounded bg-gray-800 text-white">
               <option value="2">2 vs 2</option>
               <option value="3">3 vs 3</option>
               <option value="4">4 vs 4</option>
@@ -63,7 +75,8 @@ export default function CreateGameModal({ open, onClose, onCreated }: { open: bo
 
           <div>
             <label className="text-sm text-gray-300">Pontos por Partida</label>
-            <input name="pointsPerMatch" type="number" required defaultValue={25} min={5} className="w-full p-2 rounded bg-gray-800 text-white" />
+            <input name="pointsPerMatch" type="number" required defaultValue={25} min={5}
+              className="w-full p-2 rounded bg-gray-800 text-white" />
           </div>
 
           <div className="flex items-center gap-2">
