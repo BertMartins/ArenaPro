@@ -1,4 +1,4 @@
-import { SignJWT, jwtVerify, JWTPayload } from "jose";
+import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
 
 export interface AuthToken {
@@ -8,44 +8,49 @@ export interface AuthToken {
 
 const SECRET = new TextEncoder().encode(process.env.JWT_SECRET!);
 
-// gerar token
+// Gera token
 export async function signToken(data: AuthToken) {
-  return await new SignJWT(data as unknown as JWTPayload)
+  return await new SignJWT({ ...data })
     .setProtectedHeader({ alg: "HS256" })
     .setExpirationTime("7d")
     .sign(SECRET);
 }
 
-// ler token do cookie
+// Lê token do cookie
 export async function verifyToken(): Promise<AuthToken | null> {
   try {
     const cookieStore = await cookies();
     const token = cookieStore.get("token")?.value;
+
     if (!token) return null;
 
     const { payload } = await jwtVerify(token, SECRET);
 
-    return {
-      id: payload.id as string,
-      role: payload.role as AuthToken["role"],
-    };
+    return payload as unknown as AuthToken;
   } catch {
     return null;
   }
 }
 
-// salvar token no cookie
+// Salva o token no cookie
 export async function setTokenCookie(token: string) {
-  (await cookies()).set("token", token, {
+  const cookieStore = await cookies();
+
+  cookieStore.set("token", token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    path: "/",
-    maxAge: 60 * 60 * 24 * 7,
     sameSite: "lax",
+    maxAge: 60 * 60 * 24 * 7,
+    path: "/",
   });
 }
 
-// limpar cookie
+// Limpa o token
 export async function clearTokenCookie() {
-  (await cookies()).set("token", "", { maxAge: 0, path: "/" });
+  const cookieStore = await cookies();
+
+  cookieStore.set("token", "", {
+    path: "/",
+    maxAge: 0,
+  });
 }
