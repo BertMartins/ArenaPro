@@ -10,44 +10,41 @@ export async function POST(
     const { gameId } = await context.params;
 
     const token = await verifyToken();
-    if (!token) {
+    if (!token)
       return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
-    }
 
     const game = await prisma.game.findUnique({
       where: { id: gameId },
       include: { players: true },
     });
 
-    if (!game) {
+    if (!game)
       return NextResponse.json({ error: "Jogo não encontrado" }, { status: 404 });
-    }
 
-    if (game.status !== "open") {
-      return NextResponse.json({ error: "Jogo não está aberto" }, { status: 400 });
-    }
-
-    if (game.players.length >= game.maxPlayers) {
+    if (game.players.length >= game.maxPlayers)
       return NextResponse.json({ error: "Jogo cheio" }, { status: 400 });
-    }
 
-    const already = await prisma.gamePlayer.findFirst({
+    const exists = await prisma.gamePlayer.findFirst({
       where: { gameId, userId: token.id },
     });
 
-    if (already) {
+    if (exists)
       return NextResponse.json({ error: "Você já está no jogo" }, { status: 400 });
-    }
 
     await prisma.gamePlayer.create({
       data: {
         gameId,
         userId: token.id,
-        paymentType: "monthly", // ou do usuário, se quiser
+        paymentType: "monthly",
       },
     });
 
-    return NextResponse.json({ ok: true, message: "Entrou no jogo" });
+    const updated = await prisma.game.findUnique({
+      where: { id: gameId },
+      include: { players: { include: { user: true } } },
+    });
+
+    return NextResponse.json({ ok: true, game: updated });
   } catch (err) {
     console.error("[JOIN]", err);
     return NextResponse.json(

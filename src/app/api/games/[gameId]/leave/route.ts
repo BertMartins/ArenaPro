@@ -10,26 +10,27 @@ export async function POST(
     const { gameId } = await context.params;
 
     const token = await verifyToken();
-    if (!token) {
+    if (!token)
       return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
-    }
 
     const player = await prisma.gamePlayer.findFirst({
       where: { gameId, userId: token.id },
     });
 
-    if (!player) {
+    if (!player)
       return NextResponse.json(
         { error: "Você não está no jogo" },
         { status: 400 }
       );
-    }
 
-    await prisma.gamePlayer.delete({
-      where: { id: player.id },
+    await prisma.gamePlayer.delete({ where: { id: player.id } });
+
+    const updated = await prisma.game.findUnique({
+      where: { id: gameId },
+      include: { players: { include: { user: true } } },
     });
 
-    return NextResponse.json({ ok: true, message: "Saiu do jogo" });
+    return NextResponse.json({ ok: true, game: updated });
   } catch (err) {
     console.error("[LEAVE]", err);
     return NextResponse.json(

@@ -76,11 +76,12 @@ export default function PlayerDashboard() {
             <GameCard
               key={g.id}
               game={g}
-              currentUserId=""
+              currentUserId={user?.id || ""}
               mode="player"
               onView={() => router.push(`/games/${g.id}`)}
               refresh={loadGames}
             />
+
           ))}
         </div>
       </section>

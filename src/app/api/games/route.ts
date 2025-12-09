@@ -97,12 +97,17 @@ export async function POST(req: Request) {
 // =============================================
 // GET → Listar jogos futuros (hoje +)
 // =============================================
+// GET → Listar jogos futuros
 export async function GET() {
   try {
     const games = await prisma.game.findMany({
       orderBy: { date: "asc" },
       include: {
-        players: true,
+        players: {
+          include: {
+            user: true,
+          },
+        },
       },
     });
 

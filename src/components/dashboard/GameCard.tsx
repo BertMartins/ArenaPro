@@ -6,7 +6,7 @@ import GameJoinButton from "@/components/game/GameJoinButton";
 export default function GameCard({
   game,
   currentUserId,
-  mode = "player", // "player" ou "admin"
+  mode = "player",
   onView,
   refresh,
 }: {
@@ -16,11 +16,16 @@ export default function GameCard({
   onView: () => void;
   refresh: () => void;
 }) {
-  const [loading] = useState(false);
-
-  const userIsInside = game.players.some((p: any) => p.userId === currentUserId);
   const playersCount = game.players.length;
   const progress = (playersCount / game.maxPlayers) * 100;
+
+  // === CORREÇÃO AQUI ===
+  const userIsInside = game.players.some((p: any) => {
+    return (
+      p.userId === currentUserId || // quando vem de /api/games
+      p.user?.id === currentUserId  // quando vem de /api/games/[gameId]
+    );
+  });
 
   return (
     <div className="bg-[#0f172a] rounded-xl p-4 pb-6 border border-white/10 shadow-lg mb-4">
@@ -36,7 +41,7 @@ export default function GameCard({
           </div>
         </div>
 
-        <div className="text-2xl">🏐</div>
+        <div className="inline-block mb-4 animate-bounceSoft text-2xl">🏐</div>
       </div>
 
       {/* Progress bar */}
@@ -50,17 +55,14 @@ export default function GameCard({
       {/* AÇÕES */}
       <div className="mt-4 flex items-center gap-2">
 
-        {/* PLAYER → usa GameJoinButton */}
-        {mode === "player" && (
-          <GameJoinButton
-            gameId={game.id}
-            isInside={userIsInside}
-            refresh={refresh}
-            compact
-          />
-        )}
+        {/* PARTICIPAR/SAIR */}
+        <GameJoinButton
+          gameId={game.id}
+          userIsInside={userIsInside}
+          refresh={refresh}
+        />
 
-        {/* ADMIN */}
+        {/* ADMIN BUTTON */}
         {mode === "admin" && (
           <button
             onClick={onView}
@@ -77,6 +79,7 @@ export default function GameCard({
         >
           👁️
         </button>
+
       </div>
     </div>
   );

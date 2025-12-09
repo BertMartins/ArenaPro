@@ -1,38 +1,45 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { MdHome, MdSportsVolleyball, MdPlayArrow, MdAssessment } from "react-icons/md";
 
-export default function BottomNav() {
-  const pathname = usePathname();
-
-  const linkClass = (path: string) =>
-    `flex flex-col items-center justify-center flex-1 py-2 ${
-      pathname === path ? "text-orange-400" : "text-gray-400"
-    }`;
+export default function BottomNav({ active }: { active: string }) {
+  const items = [
+    { id: "home", icon: "fa-home", label: "Início", href: "/" },
+    { id: "games", icon: "fa-calendar", label: "Jogos", href: "/games" },
+    { id: "play", icon: "fa-play-circle", label: "Play", href: "/play", highlight: false },
+    { id: "stats", icon: "fa-chart-bar", label: "Stats", href: "/stats" },
+  ];
 
   return (
-    <nav className="fixed bottom-0 left-0 w-full bg-[#0B1120] border-t border-white/10 flex z-50">
-      <Link href="/dashboard" className={linkClass("/dashboard")}>
-        <MdHome size={24} />
-        <span className="text-xs">Início</span>
-      </Link>
+    <nav className="fixed bottom-0 left-0 right-0 bg-[#0d1117]/95 backdrop-blur-xl border-t border-white/10 shadow-[0_-4px_20px_rgba(0,0,0,0.4)] z-50">
+      <div className="grid grid-cols-4 gap-1 p-2">
+        {items.map((item) => {
+          const isActive = active === item.id;
 
-      <Link href="/dashboard/jogos" className={linkClass("/dashboard/jogos")}>
-        <MdSportsVolleyball size={24} />
-        <span className="text-xs">Jogos</span>
-      </Link>
+          return (
+            <Link
+              key={item.id}
+              href={item.href}
+              className={`relative flex flex-col items-center justify-center py-3 rounded-lg transition-all duration-200 
+                ${isActive
+                  ? "bg-orange-500 text-white shadow-lg"
+                  : "text-gray-400 hover:bg-gray-800 hover:text-white"
+                }`}
+            >
+              {item.highlight && (
+                <div className="absolute top-1 right-1 w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+              )}
 
-      <Link href="/dashboard/play" className={linkClass("/dashboard/play")}>
-        <MdPlayArrow size={24} />
-        <span className="text-xs">Play</span>
-      </Link>
+              <i
+                className={`fas ${item.icon} text-xl mb-1 
+                  ${item.highlight ? "animate-pulse" : ""}`}
+              ></i>
 
-      <Link href="/dashboard/stats" className={linkClass("/dashboard/stats")}>
-        <MdAssessment size={24} />
-        <span className="text-xs">Stats</span>
-      </Link>
+              <span className="text-xs font-medium">{item.label}</span>
+            </Link>
+          );
+        })}
+      </div>
     </nav>
   );
 }
