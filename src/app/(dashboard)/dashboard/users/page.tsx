@@ -121,7 +121,7 @@ export default function UsersAdminPage() {
         />
       )}
       
-    <BottomNav active="home" />
+    <BottomNav active="home" role="admin" />
     </div>
   );
 }

@@ -86,7 +86,7 @@ export default function PlayerDashboard() {
         </div>
       </section>
 
-      <BottomNav active="home" />
+      <BottomNav active="home" role="player" />
     </div>
   );
 }

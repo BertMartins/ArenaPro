@@ -2,9 +2,17 @@
 
 import Link from "next/link";
 
-export default function BottomNav({ active }: { active: string }) {
+export default function BottomNav({
+  active,
+  role,
+}: {
+  active: string;
+  role: "admin" | "player";
+}) {
+  const homeHref = role === "admin" ? "/dashboard" : "/player";
+
   const items = [
-    { id: "home", label: "Início", icon: "fa-solid fa-house", href: "/" },
+    { id: "home", label: "Início", icon: "fa-solid fa-house", href: homeHref },
     { id: "games", label: "Jogos", icon: "fa-solid fa-calendar", href: "/games" },
     { id: "play", label: "Play", icon: "fa-solid fa-play-circle", href: "/play" },
     { id: "stats", label: "Stats", icon: "fa-solid fa-chart-bar", href: "/stats" },
@@ -34,24 +42,14 @@ export default function BottomNav({ active }: { active: string }) {
                   : "text-gray-400 hover:bg-gray-800 hover:text-white"}
               `}
             >
-              {/* Ícone */}
-              <i
-                className={`${item.icon} text-xl mb-1 ${
-                  isActive ? "animate-pulse" : ""
-                }`}
-              />
-
-              {/* Texto */}
+              <i className={`${item.icon} text-xl mb-1 ${isActive ? "animate-pulse" : ""}`} />
               <span className="text-xs font-medium">{item.label}</span>
 
-              {/* Pontinho indicador do Play */}
               {item.id === "play" && (
-                <div 
-                  className="
-                    absolute top-1 right-1 w-2 h-2 rounded-full 
-                    bg-green-500 animate-pulse
-                  "
-                />
+                <div className="
+                  absolute top-1 right-1 w-2 h-2 rounded-full 
+                  bg-green-500 animate-pulse
+                " />
               )}
             </Link>
           );

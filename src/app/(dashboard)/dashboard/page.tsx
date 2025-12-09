@@ -116,7 +116,7 @@ export default function DashboardAdminPage() {
         }}
       />
 
-      <BottomNav active="home" />
+      <BottomNav active="home" role="admin" />
     </div>
   );
 }
