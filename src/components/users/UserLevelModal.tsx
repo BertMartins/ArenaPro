@@ -18,7 +18,7 @@ export default function UserLevelModal({
     setLoading(true);
 
     const res = await fetch(`/api/admin/users/${user.id}/level`, {
-      method: "PATCH",
+      method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ level }),
     });

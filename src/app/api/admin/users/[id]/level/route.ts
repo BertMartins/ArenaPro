@@ -10,9 +10,10 @@ export async function POST(req: Request, { params }: any) {
 
     const body = await req.json();
 
-    const updated = await prisma.userStats.update({
+    const updated = await prisma.userStats.upsert({
       where: { userId: params.id },
-      data: { level: Number(body.level) },
+      update: { level: Number(body.level) },
+      create: { userId: params.id, level: Number(body.level) },
     });
 
     return NextResponse.json({ ok: true, stats: updated });

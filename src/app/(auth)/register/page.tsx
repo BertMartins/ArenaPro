@@ -1,12 +1,15 @@
 "use client";
 
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 export default function RegisterPage() {
   const router = useRouter();
+  const [loading, setLoading] = useState(false);
 
   async function handleSubmit(e: any) {
     e.preventDefault();
+    setLoading(true);
 
     const name = e.target.name.value;
     const email = e.target.email.value;
@@ -14,18 +17,36 @@ export default function RegisterPage() {
 
     const res = await fetch("/api/auth/register", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name, email, password }),
     });
 
     const data = await res.json();
 
-    if (res.ok) {
-      router.push("/dashboard");
-    } else {
+    if (!res.ok) {
       alert(data.error);
+      setLoading(false);
+      return;
+    }
+
+    // Login automático após cadastro
+    const loginRes = await fetch("/api/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    });
+
+    const loginData = await loginRes.json();
+    setLoading(false);
+
+    if (loginRes.ok) {
+      if (loginData.user.role === "admin") {
+        window.location.href = "/dashboard";
+      } else {
+        window.location.href = "/player";
+      }
+    } else {
+      router.push("/login");
     }
   }
 
@@ -79,9 +100,10 @@ return (
 
           <button
             type="submit"
-            className="btn-primary w-full py-3 rounded-lg text-white font-bold text-lg"
+            disabled={loading}
+            className="btn-primary w-full py-3 rounded-lg text-white font-bold text-lg disabled:opacity-60"
           >
-            CRIAR CONTA
+            {loading ? "Criando conta..." : "CRIAR CONTA"}
           </button>
 
         </form>

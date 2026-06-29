@@ -15,14 +15,14 @@ export default function UserCard({
 
   async function toggleRole() {
     setLoading(true);
-    const res = await fetch(`/api/admin/users/${user.id}/role`, { method: "PATCH" });
+    await fetch(`/api/admin/users/${user.id}/toggle-role`, { method: "POST" });
     setLoading(false);
     onRefresh();
   }
 
   async function togglePayment() {
     setLoading(true);
-    const res = await fetch(`/api/admin/users/${user.id}/payment`, { method: "PATCH" });
+    await fetch(`/api/admin/users/${user.id}/toggle-payment`, { method: "POST" });
     setLoading(false);
     onRefresh();
   }

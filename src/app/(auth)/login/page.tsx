@@ -16,6 +16,7 @@ export default function LoginPage() {
 
     const res = await fetch("/api/auth/login", {
       method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password }),
     });
 
@@ -93,11 +94,6 @@ export default function LoginPage() {
           </a>
         </div>
 
-        <div className="mt-2 text-center">
-          <a href="/forgot-password" className="text-gray-400 hover:text-gray-200 text-sm">
-            Esqueceu sua senha?
-          </a>
-        </div>
 
       </div>
     </div>
