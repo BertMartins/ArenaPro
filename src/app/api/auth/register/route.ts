@@ -19,7 +19,7 @@ export async function POST(req: Request) {
         role: "player",
         level: typeof level === "number" && level >= 1 && level <= 6 ? level : 1,
         paymentType: paymentType === "daily" ? "daily" : "monthly",
-        stats: { create: {} },
+        stats: { create: { level: typeof level === "number" && level >= 1 && level <= 6 ? level : 1 } },
       },
     });
 
