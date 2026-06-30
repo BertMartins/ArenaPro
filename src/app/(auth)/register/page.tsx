@@ -24,7 +24,7 @@ const LEVEL_COLORS: Record<number, string> = {
 export default function RegisterPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [paymentType, setPaymentType] = useState<"monthly" | "daily">("monthly");
+  const paymentType = "daily";
   const [level, setLevel] = useState<number>(0);
 
   async function handleSubmit(e: any) {
@@ -116,39 +116,6 @@ export default function RegisterPage() {
                 required
                 className="custom-input w-full px-3 py-2.5 rounded-lg text-white bg-gray-800/40 border border-gray-700 text-sm"
               />
-            </div>
-
-            {/* Tipo de Pagamento */}
-            <div>
-              <label className="block text-white font-medium mb-2 text-sm">💳 Tipo de Pagamento</label>
-              <div className="grid grid-cols-2 gap-2">
-                <button
-                  type="button"
-                  onClick={() => setPaymentType("monthly")}
-                  className={`p-3 rounded-lg border-2 text-center transition ${
-                    paymentType === "monthly"
-                      ? "border-orange-500 bg-orange-500/20"
-                      : "border-gray-600 bg-gray-800/40 hover:border-gray-500"
-                  }`}
-                >
-                  <div className="text-xl mb-1">📅</div>
-                  <div className="text-white font-bold text-xs">Mensalista</div>
-                  <div className="text-gray-400 text-xs">Pag. mensal</div>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setPaymentType("daily")}
-                  className={`p-3 rounded-lg border-2 text-center transition ${
-                    paymentType === "daily"
-                      ? "border-blue-500 bg-blue-500/20"
-                      : "border-gray-600 bg-gray-800/40 hover:border-gray-500"
-                  }`}
-                >
-                  <div className="text-xl mb-1">🎫</div>
-                  <div className="text-white font-bold text-xs">Diarista</div>
-                  <div className="text-gray-400 text-xs">Pag. por jogo</div>
-                </button>
-              </div>
             </div>
 
             {/* Nível do Jogador */}
