@@ -68,13 +68,13 @@ export default function DashboardAdminPage() {
   }, []);
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-3 sm:p-5 space-y-4 pb-24 max-w-2xl mx-auto">
       <StatsHeader />
 
       <AdminActionsBar onCreate={() => setModalOpen(true)} />
 
       <section>
-        <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+        <h2 className="text-base sm:text-lg font-semibold text-white mb-3 flex items-center gap-2">
           <span className="text-orange-400">📅</span> Jogos Disponíveis
         </h2>
 

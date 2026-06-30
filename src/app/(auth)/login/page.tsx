@@ -24,8 +24,6 @@ export default function LoginPage() {
 
     if (res.ok) {
       toast("Login realizado!", "success");
-
-      // redirecionamento baseado no papel salvo no token
       if (data.user.role === "admin") {
         window.location.href = "/dashboard";
       } else {
@@ -39,41 +37,41 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen px-6 page-animate">
+    <div className="flex flex-col items-center justify-center min-h-screen px-4 py-8 page-animate">
 
       {/* LOGO */}
-      <div className="text-center mb-10 animate-fadeIn">
-        <div className="inline-block text-6xl mb-4 animate-bounceSoft">🏐</div>
-        <h1 className="title-font font-bold text-5xl text-white">BOLINHACLUB</h1>
-        <p className="text-gray-400 mt-1">Gestão Profissional de Jogos</p>
+      <div className="text-center mb-6 sm:mb-10 animate-fadeIn">
+        <div className="inline-block text-5xl sm:text-6xl mb-3 sm:mb-4 animate-bounceSoft">🏐</div>
+        <h1 className="title-font font-bold text-4xl sm:text-5xl text-white">BOLINHACLUB</h1>
+        <p className="text-gray-400 mt-1 text-sm sm:text-base">Gestão Profissional de Jogos</p>
       </div>
 
       {/* CARD */}
-      <div className="glass-card p-8 rounded-2xl w-full max-w-md animate-slideIn">
+      <div className="glass-card p-5 sm:p-8 rounded-2xl w-full max-w-md animate-slideIn">
 
-        <form className="space-y-6" onSubmit={handleLogin}>
+        <form className="space-y-4" onSubmit={handleLogin}>
 
           {/* EMAIL */}
           <div>
-            <label className="block text-gray-300 mb-2 font-medium">Email</label>
+            <label className="block text-gray-300 mb-1 text-sm font-medium">Email</label>
             <input
               name="email"
               type="email"
               required
               placeholder="Digite seu login"
-              className="w-full px-4 py-3 rounded-lg bg-gray-900 text-white border border-gray-700 focus:ring focus:ring-orange-500"
+              className="w-full px-3 py-2.5 rounded-lg bg-gray-900 text-white border border-gray-700 focus:ring focus:ring-orange-500 text-sm"
             />
           </div>
 
           {/* SENHA */}
           <div>
-            <label className="block text-gray-300 mb-2 font-medium">Senha</label>
+            <label className="block text-gray-300 mb-1 text-sm font-medium">Senha</label>
             <input
               name="password"
               type="password"
               required
               placeholder="Digite sua senha"
-              className="w-full px-4 py-3 rounded-lg bg-gray-900 text-white border border-gray-700 focus:ring focus:ring-orange-500"
+              className="w-full px-3 py-2.5 rounded-lg bg-gray-900 text-white border border-gray-700 focus:ring focus:ring-orange-500 text-sm"
             />
           </div>
 
@@ -81,19 +79,18 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="btn-primary w-full py-3 rounded-lg text-white font-bold text-lg"
+            className="btn-primary w-full py-3 rounded-lg text-white font-bold text-base"
           >
             {loading ? "Entrando..." : "ENTRAR"}
           </button>
         </form>
 
         {/* LINKS */}
-        <div className="mt-6 text-center">
-          <a href="/register" className="text-orange-400 hover:text-orange-300 font-medium">
+        <div className="mt-4 text-center">
+          <a href="/register" className="text-orange-400 hover:text-orange-300 font-medium text-sm">
             Não tem conta? Cadastre-se
           </a>
         </div>
-
 
       </div>
     </div>

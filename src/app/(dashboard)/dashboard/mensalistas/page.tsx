@@ -68,13 +68,13 @@ export default function MensalistasPage() {
   const pendingCount = totalCount - paidCount;
 
   return (
-    <div className="pb-24 animate-fadeIn">
+    <div className="pb-24 animate-fadeIn max-w-2xl mx-auto">
       {/* Header */}
-      <div className="p-6" style={{ background: "linear-gradient(135deg, #ff7a18, #ff9e32)" }}>
+      <div className="p-4 sm:p-6" style={{ background: "linear-gradient(135deg, #ff7a18, #ff9e32)" }}>
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-black text-white tracking-wider">MENSALIDADES</h1>
-            <p className="text-orange-100">Controle de pagamentos mensais</p>
+            <h1 className="text-2xl sm:text-3xl font-black text-white tracking-wider">MENSALIDADES</h1>
+            <p className="text-orange-100 text-sm">Controle de pagamentos mensais</p>
           </div>
           <button onClick={() => router.push("/dashboard")} className="text-white hover:bg-white/20 p-2 rounded-lg">
             ✕
@@ -82,13 +82,13 @@ export default function MensalistasPage() {
         </div>
       </div>
 
-      <div className="p-6 space-y-6">
+      <div className="p-3 sm:p-5 space-y-4">
         {/* Configuração */}
-        <div className="glass-card rounded-xl p-5">
-          <h3 className="text-white font-bold text-lg mb-4">⚙️ Configuração — {monthLabel}</h3>
-          <div className="flex gap-3 mb-4">
+        <div className="glass-card rounded-xl p-4">
+          <h3 className="text-white font-bold text-base mb-3">⚙️ Configuração — {monthLabel}</h3>
+          <div className="flex gap-2 mb-3">
             <div className="relative flex-1">
-              <span className="absolute left-4 top-3.5 text-gray-400">R$</span>
+              <span className="absolute left-3 top-3 text-gray-400 text-sm">R$</span>
               <input
                 type="number"
                 value={feeInput}
@@ -96,7 +96,7 @@ export default function MensalistasPage() {
                 min="0"
                 step="0.01"
                 placeholder="0,00"
-                className="custom-input w-full pl-12 pr-4 py-3 rounded-lg text-white bg-gray-800/50 border border-gray-600"
+                className="custom-input w-full pl-10 pr-3 py-2.5 rounded-lg text-white bg-gray-800/50 border border-gray-600 text-sm"
               />
             </div>
             <button

@@ -150,86 +150,86 @@ export default function GameDetailPage() {
   const getUserId = (p: any) => p.userId ?? p.user?.id ?? p.id;
 
   return (
-    <div className="pb-24 animate-fadeIn">
+    <div className="pb-24 animate-fadeIn max-w-2xl mx-auto">
       {/* Header */}
-      <div className="p-6" style={{ background: "linear-gradient(135deg, #1E40AF 0%, #3B82F6 100%)" }}>
+      <div className="p-4 sm:p-6" style={{ background: "linear-gradient(135deg, #1E40AF 0%, #3B82F6 100%)" }}>
         <button
           onClick={() => router.back()}
-          className="text-white mb-4 hover:bg-white/20 px-3 py-2 rounded-lg transition"
+          className="text-white mb-3 hover:bg-white/20 px-3 py-1.5 rounded-lg transition text-sm"
         >
           ← Voltar
         </button>
-        <h1 className="text-3xl font-black text-white tracking-wider">DETALHES DO JOGO</h1>
-        <p className="text-blue-100 mt-1">
+        <h1 className="text-2xl sm:text-3xl font-black text-white tracking-wider">DETALHES DO JOGO</h1>
+        <p className="text-blue-100 mt-1 text-xs sm:text-sm">
           📅 {new Date(game.date).toLocaleDateString("pt-BR", {
             weekday: "long", year: "numeric", month: "long", day: "numeric"
           })}
         </p>
       </div>
 
-      <div className="p-6 space-y-5">
+      <div className="p-3 sm:p-5 space-y-4">
         {/* Status badge */}
         {game.status === "in_progress" && (
-          <div className="bg-green-500/20 border-2 border-green-500 rounded-xl p-4 text-center animate-pulse">
-            <div className="text-green-300 font-bold text-lg">⚡ JOGO EM ANDAMENTO</div>
-            <div className="text-green-400 text-sm">Lista de participantes bloqueada</div>
+          <div className="bg-green-500/20 border-2 border-green-500 rounded-xl p-3 text-center animate-pulse">
+            <div className="text-green-300 font-bold text-base sm:text-lg">⚡ JOGO EM ANDAMENTO</div>
+            <div className="text-green-400 text-xs sm:text-sm">Lista de participantes bloqueada</div>
           </div>
         )}
 
         {/* Configurações */}
-        <div className="glass-card rounded-xl p-5">
-          <h3 className="text-white font-bold text-lg mb-3">⚙️ Configurações</h3>
-          <div className="grid grid-cols-2 gap-3">
-            <div className="bg-blue-500/20 border border-blue-500 rounded-lg p-3 text-center">
-              <div className="text-2xl font-bold text-blue-400">{game.teamSize}</div>
+        <div className="glass-card rounded-xl p-4">
+          <h3 className="text-white font-bold text-base mb-2">⚙️ Configurações</h3>
+          <div className="grid grid-cols-2 gap-2">
+            <div className="bg-blue-500/20 border border-blue-500 rounded-lg p-2.5 text-center">
+              <div className="text-xl font-bold text-blue-400">{game.teamSize}</div>
               <div className="text-gray-300 text-xs">Jogadores/Time</div>
             </div>
-            <div className="bg-orange-500/20 border border-orange-500 rounded-lg p-3 text-center">
-              <div className="text-2xl font-bold text-orange-400">{game.pointsPerMatch}</div>
+            <div className="bg-orange-500/20 border border-orange-500 rounded-lg p-2.5 text-center">
+              <div className="text-xl font-bold text-orange-400">{game.pointsPerMatch}</div>
               <div className="text-gray-300 text-xs">Pontos/Partida</div>
             </div>
           </div>
           {game.twoWinsRule && (
-            <div className="mt-3 bg-yellow-500/10 border border-yellow-500/40 rounded-lg p-2 text-center text-xs text-yellow-300">
+            <div className="mt-2 bg-yellow-500/10 border border-yellow-500/40 rounded-lg p-2 text-center text-xs text-yellow-300">
               🏆 Regra "Ganhou 2 Sai" ativa
             </div>
           )}
         </div>
 
         {/* Vagas */}
-        <div className="glass-card rounded-xl p-4">
+        <div className="glass-card rounded-xl p-3 sm:p-4">
           <div className="flex justify-between text-center">
             <div>
-              <div className="text-3xl font-bold text-orange-400">{allPlayers.length}</div>
-              <div className="text-gray-400 text-sm">Confirmados</div>
+              <div className="text-2xl sm:text-3xl font-bold text-orange-400">{allPlayers.length}</div>
+              <div className="text-gray-400 text-xs">Confirmados</div>
             </div>
             <div>
-              <div className="text-3xl font-bold text-gray-400">{Math.max(0, game.maxPlayers - mainPlayers.length)}</div>
-              <div className="text-gray-400 text-sm">Vagas</div>
+              <div className="text-2xl sm:text-3xl font-bold text-gray-400">{Math.max(0, game.maxPlayers - mainPlayers.length)}</div>
+              <div className="text-gray-400 text-xs">Vagas</div>
             </div>
             <div>
-              <div className="text-3xl font-bold text-blue-400">{game.maxPlayers}</div>
-              <div className="text-gray-400 text-sm">Limite</div>
+              <div className="text-2xl sm:text-3xl font-bold text-blue-400">{game.maxPlayers}</div>
+              <div className="text-gray-400 text-xs">Limite</div>
             </div>
           </div>
-          <div className="mt-3 bg-gray-700 rounded-full h-2">
+          <div className="mt-2.5 bg-gray-700 rounded-full h-1.5">
             <div
-              className="bg-orange-500 h-2 rounded-full transition-all"
+              className="bg-orange-500 h-1.5 rounded-full transition-all"
               style={{ width: `${Math.min(100, (mainPlayers.length / game.maxPlayers) * 100)}%` }}
             />
           </div>
         </div>
 
         {/* Lista Principal */}
-        <div className="glass-card rounded-xl p-5 border-2 border-green-500/40">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-white font-bold text-lg">
+        <div className="glass-card rounded-xl p-4 border-2 border-green-500/40">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-white font-bold text-base">
               ✅ Lista Principal ({mainPlayers.length}/{game.maxPlayers})
             </h3>
             {isAdmin && game.status === "open" && (
               <button
                 onClick={() => setVisitorModal(true)}
-                className="bg-orange-500 hover:bg-orange-400 px-3 py-2 rounded-lg text-white text-sm font-bold"
+                className="bg-orange-500 hover:bg-orange-400 px-2.5 py-1.5 rounded-lg text-white text-xs font-bold"
               >
                 + Visitante
               </button>
@@ -270,8 +270,8 @@ export default function GameDetailPage() {
 
         {/* Suplentes */}
         {reservePlayers.length > 0 && (
-          <div className="glass-card rounded-xl p-5 border-2 border-yellow-500/40">
-            <h3 className="text-white font-bold text-lg mb-3">⏳ Suplentes ({reservePlayers.length})</h3>
+          <div className="glass-card rounded-xl p-4 border-2 border-yellow-500/40">
+            <h3 className="text-white font-bold text-base mb-2">⏳ Suplentes ({reservePlayers.length})</h3>
             <div className="bg-yellow-500/10 border border-yellow-500/40 rounded-lg p-3 mb-3 text-center text-xs text-yellow-300">
               Diaristas que entrarão na lista se houver vagas após 15h
             </div>
@@ -310,12 +310,12 @@ export default function GameDetailPage() {
 
         {/* Ações */}
         {game.status === "open" && (
-          <div className="space-y-3">
+          <div className="space-y-2 sm:space-y-3">
             {!userIsIn && !isAdmin && (
               <button
                 onClick={handleJoin}
                 disabled={saving}
-                className="btn-primary w-full py-4 rounded-xl text-white font-bold text-lg"
+                className="btn-primary w-full py-3 sm:py-4 rounded-xl text-white font-bold text-base sm:text-lg"
               >
                 + PARTICIPAR
               </button>
@@ -324,7 +324,7 @@ export default function GameDetailPage() {
               <button
                 onClick={handleLeave}
                 disabled={saving}
-                className="w-full py-4 rounded-xl bg-red-500 hover:bg-red-600 text-white font-bold text-lg"
+                className="w-full py-3 sm:py-4 rounded-xl bg-red-500 hover:bg-red-600 text-white font-bold text-base sm:text-lg"
               >
                 Sair do Jogo {userInReserve ? "(Suplente)" : ""}
               </button>
@@ -333,13 +333,13 @@ export default function GameDetailPage() {
               <button
                 onClick={handleStart}
                 disabled={saving}
-                className="btn-primary w-full py-4 rounded-xl text-white font-bold text-lg"
+                className="btn-primary w-full py-3 sm:py-4 rounded-xl text-white font-bold text-base sm:text-lg"
               >
                 🎯 CRIAR TIMES E INICIAR
               </button>
             )}
             {isAdmin && mainPlayers.length < game.teamSize * 2 && (
-              <div className="bg-yellow-500/20 border border-yellow-500 rounded-xl p-4 text-center text-yellow-300 text-sm">
+              <div className="bg-yellow-500/20 border border-yellow-500 rounded-xl p-3 text-center text-yellow-300 text-xs sm:text-sm">
                 ⚠️ Mínimo de {game.teamSize * 2} jogadores para iniciar ({game.teamSize} por time)
               </div>
             )}
@@ -349,7 +349,7 @@ export default function GameDetailPage() {
         {game.status === "in_progress" && (
           <button
             onClick={() => router.push("/play")}
-            className="w-full py-4 rounded-xl bg-green-500 hover:bg-green-400 text-white font-bold text-lg animate-pulse"
+            className="w-full py-3 sm:py-4 rounded-xl bg-green-500 hover:bg-green-400 text-white font-bold text-base sm:text-lg animate-pulse"
           >
             ▶ IR PARA O JOGO
           </button>
@@ -413,7 +413,7 @@ export default function GameDetailPage() {
 
       {/* Toast */}
       {toast && (
-        <div className={`fixed top-4 right-4 px-5 py-3 rounded-lg text-white z-50 shadow-lg animate-slideIn ${
+        <div className={`fixed top-4 right-4 left-4 sm:left-auto px-4 py-3 rounded-lg text-white z-50 shadow-lg animate-slideIn text-sm ${
           toast.type === "error" ? "bg-red-500" : toast.type === "info" ? "bg-blue-500" : "bg-green-500"
         }`}>
           {toast.msg}

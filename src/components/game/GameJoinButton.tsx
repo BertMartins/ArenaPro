@@ -33,7 +33,7 @@ export default function GameJoinButton({
     <button
       disabled={loading}
       onClick={handleClick}
-      className={`flex-1 py-3 rounded-lg font-bold text-white text-lg transition flex items-center justify-center gap-2
+      className={`flex-1 py-2.5 rounded-lg font-bold text-white text-sm sm:text-base transition flex items-center justify-center gap-2
       ${userIsInside ? "bg-red-600 hover:bg-red-700" : "bg-orange-500 hover:bg-orange-600"}`}
     >
       {loading ? "Aguarde..." : userIsInside ? "👤 Sair" : "👥 Participar"}

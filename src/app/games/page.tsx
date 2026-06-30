@@ -54,8 +54,8 @@ export default function GamesPage() {
   }, []);
 
   return (
-    <div className="p-6 pb-24 space-y-6">
-      <h2 className="text-lg font-semibold text-white flex items-center gap-2">
+    <div className="p-3 sm:p-5 pb-24 space-y-4 max-w-2xl mx-auto">
+      <h2 className="text-base sm:text-lg font-semibold text-white flex items-center gap-2">
         <span className="text-orange-400">📅</span> Jogos Disponíveis
       </h2>
 

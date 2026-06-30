@@ -227,12 +227,12 @@ export default function PlayPage() {
 
   if (!game || teams.length === 0) {
     return (
-      <div className="pb-24 p-6">
-        <div className="glass-card rounded-xl p-8 text-center mt-8">
-          <div className="text-6xl mb-4">🏐</div>
-          <h3 className="text-white text-xl font-bold mb-2">Nenhum Jogo em Andamento</h3>
-          <p className="text-gray-400 mb-6">Crie times a partir de um jogo para começar</p>
-          <button onClick={() => router.push("/dashboard")} className="btn-primary px-6 py-3 rounded-lg text-white font-bold">
+      <div className="pb-24 p-4 max-w-2xl mx-auto">
+        <div className="glass-card rounded-xl p-6 sm:p-8 text-center mt-8">
+          <div className="text-5xl sm:text-6xl mb-3">🏐</div>
+          <h3 className="text-white text-lg sm:text-xl font-bold mb-2">Nenhum Jogo em Andamento</h3>
+          <p className="text-gray-400 text-sm mb-5">Crie times a partir de um jogo para começar</p>
+          <button onClick={() => router.push("/dashboard")} className="btn-primary px-5 py-2.5 rounded-lg text-white font-bold text-sm">
             Ir para Jogos
           </button>
         </div>
@@ -250,61 +250,61 @@ export default function PlayPage() {
   });
 
   return (
-    <div className="pb-24 animate-fadeIn">
+    <div className="pb-24 animate-fadeIn max-w-2xl mx-auto">
       {/* Header */}
-      <div className="p-6" style={{ background: "linear-gradient(135deg, #ff7a18, #ff9e32)" }}>
-        <h1 className="text-3xl font-black text-white tracking-wider">⚡ JOGO EM ANDAMENTO</h1>
-        <p className="text-orange-100">📅 {new Date(game.date).toLocaleDateString("pt-BR")}</p>
+      <div className="p-4 sm:p-6" style={{ background: "linear-gradient(135deg, #ff7a18, #ff9e32)" }}>
+        <h1 className="text-2xl sm:text-3xl font-black text-white tracking-wider">⚡ JOGO EM ANDAMENTO</h1>
+        <p className="text-orange-100 text-sm">📅 {new Date(game.date).toLocaleDateString("pt-BR")}</p>
       </div>
 
-      <div className="p-6 space-y-5">
+      <div className="p-3 sm:p-5 space-y-4">
         {/* Partida atual */}
         {activeMatch && (
-          <div className="glass-card rounded-xl p-5">
-            <h3 className="text-white font-bold text-lg mb-4 text-center">🏐 Partida #{activeMatch.matchNumber}</h3>
-            <div className="text-center text-gray-400 text-xs mb-4">Até {activeMatch.maxPoints} pontos (diff. 2)</div>
-            <div className="grid grid-cols-2 gap-4 mb-4">
+          <div className="glass-card rounded-xl p-4 sm:p-5">
+            <h3 className="text-white font-bold text-base sm:text-lg mb-3 text-center">🏐 Partida #{activeMatch.matchNumber}</h3>
+            <div className="text-center text-gray-400 text-xs mb-3">Até {activeMatch.maxPoints} pontos (diff. 2)</div>
+            <div className="grid grid-cols-2 gap-3 mb-3">
               {/* Time 1 */}
               <div className="text-center">
-                <div className="inline-block px-4 py-2 rounded-full text-white font-bold mb-3 text-sm"
+                <div className="inline-block px-3 py-1.5 rounded-full text-white font-bold mb-2 text-xs sm:text-sm"
                   style={{ background: activeMatch.team1.color }}>
                   {activeMatch.team1.name}
                 </div>
-                <div className="text-6xl font-black text-white mb-3">{activeMatch.score1}</div>
+                <div className="text-5xl sm:text-6xl font-black text-white mb-2">{activeMatch.score1}</div>
                 {isAdmin && !activeMatch.finished && (
                   <div className="flex gap-2 justify-center">
                     <button onClick={() => updateScore(1, -1)}
-                      className="w-12 h-12 rounded-full bg-red-500 hover:bg-red-400 text-white font-bold text-xl">−</button>
+                      className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-red-500 hover:bg-red-400 text-white font-bold text-lg sm:text-xl">−</button>
                     <button onClick={() => updateScore(1, 1)}
-                      className="w-12 h-12 rounded-full bg-green-500 hover:bg-green-400 text-white font-bold text-xl">+</button>
+                      className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-green-500 hover:bg-green-400 text-white font-bold text-lg sm:text-xl">+</button>
                   </div>
                 )}
               </div>
               {/* Time 2 */}
               <div className="text-center">
-                <div className="inline-block px-4 py-2 rounded-full text-white font-bold mb-3 text-sm"
+                <div className="inline-block px-3 py-1.5 rounded-full text-white font-bold mb-2 text-xs sm:text-sm"
                   style={{ background: activeMatch.team2.color }}>
                   {activeMatch.team2.name}
                 </div>
-                <div className="text-6xl font-black text-white mb-3">{activeMatch.score2}</div>
+                <div className="text-5xl sm:text-6xl font-black text-white mb-2">{activeMatch.score2}</div>
                 {isAdmin && !activeMatch.finished && (
                   <div className="flex gap-2 justify-center">
                     <button onClick={() => updateScore(2, -1)}
-                      className="w-12 h-12 rounded-full bg-red-500 hover:bg-red-400 text-white font-bold text-xl">−</button>
+                      className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-red-500 hover:bg-red-400 text-white font-bold text-lg sm:text-xl">−</button>
                     <button onClick={() => updateScore(2, 1)}
-                      className="w-12 h-12 rounded-full bg-green-500 hover:bg-green-400 text-white font-bold text-xl">+</button>
+                      className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-green-500 hover:bg-green-400 text-white font-bold text-lg sm:text-xl">+</button>
                   </div>
                 )}
               </div>
             </div>
             {activeMatch.finished && (
-              <div className="text-center py-4">
-                <div className="text-4xl mb-2">🏆</div>
-                <div className="text-yellow-400 font-bold text-xl mb-3">
+              <div className="text-center py-3">
+                <div className="text-3xl sm:text-4xl mb-2">🏆</div>
+                <div className="text-yellow-400 font-bold text-lg sm:text-xl mb-3">
                   Time {activeMatch.score1 > activeMatch.score2 ? activeMatch.team1.name : activeMatch.team2.name} Venceu!
                 </div>
                 {isAdmin && (
-                  <button onClick={handleNextMatch} className="btn-primary px-6 py-3 rounded-lg text-white font-bold">
+                  <button onClick={handleNextMatch} className="btn-primary px-5 py-2.5 rounded-lg text-white font-bold text-sm">
                     Próxima Partida →
                   </button>
                 )}
@@ -317,28 +317,28 @@ export default function PlayPage() {
         {teams.map((team, idx) => (
           <div key={team.id} className="glass-card rounded-xl overflow-hidden"
             style={{ animationDelay: `${idx * 0.1}s` }}>
-            <div className="p-4 text-white" style={{ background: `${team.color}cc` }}>
-              <h3 className="font-bold text-lg">🛡 Time {team.name}</h3>
+            <div className="p-3 sm:p-4 text-white" style={{ background: `${team.color}cc` }}>
+              <h3 className="font-bold text-base sm:text-lg">🛡 Time {team.name}</h3>
               {team.players.length > 0 && (
-                <p className="text-white/80 text-sm">
+                <p className="text-white/80 text-xs sm:text-sm">
                   Nível médio: {(team.players.reduce((s: number, p: any) => s + (p.user?.stats?.level ?? p.user?.level ?? 1), 0) / team.players.length).toFixed(1)}
                 </p>
               )}
             </div>
-            <div className="p-4 space-y-3">
+            <div className="p-3 sm:p-4 space-y-2 sm:space-y-3">
               {team.players.map((p: any) => {
                 const u = p.user;
                 const lvl = u?.stats?.level ?? u?.level ?? 1;
                 return (
                   <div key={p.id} className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <span className="text-xl">{u?.photo ?? "🏐"}</span>
+                    <div className="flex items-center gap-2 sm:gap-3">
+                      <span className="text-lg sm:text-xl">{u?.photo ?? "🏐"}</span>
                       <div>
                         <div className="text-white font-medium text-sm">{u?.name}</div>
                         <div className="text-gray-400 text-xs">{u?.stats?.wins ?? 0}V / {u?.stats?.losses ?? 0}D</div>
                       </div>
                     </div>
-                    <span className={`w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-bold ${LEVEL_COLORS[lvl] ?? "bg-gray-500"}`}>
+                    <span className={`w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center text-white text-xs font-bold ${LEVEL_COLORS[lvl] ?? "bg-gray-500"}`}>
                       {lvl}
                     </span>
                   </div>
@@ -350,39 +350,39 @@ export default function PlayPage() {
 
         {/* Histórico */}
         {matchHistory.length > 0 && (
-          <div className="glass-card rounded-xl p-5">
-            <h3 className="text-white font-bold text-lg mb-4">📜 Histórico ({matchHistory.length} partida{matchHistory.length > 1 ? "s" : ""})</h3>
+          <div className="glass-card rounded-xl p-4 sm:p-5">
+            <h3 className="text-white font-bold text-base sm:text-lg mb-3">📜 Histórico ({matchHistory.length} partida{matchHistory.length > 1 ? "s" : ""})</h3>
 
             {/* Placar geral */}
-            <div className="space-y-2 mb-4">
+            <div className="space-y-1.5 mb-3">
               {teams.map((t) => (
-                <div key={t.id} className="flex items-center justify-between bg-gray-700/50 rounded-lg p-3">
+                <div key={t.id} className="flex items-center justify-between bg-gray-700/50 rounded-lg p-2.5">
                   <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 rounded-full" style={{ background: t.color }} />
-                    <span className="text-white font-bold">{t.name}</span>
+                    <div className="w-3 h-3 rounded-full" style={{ background: t.color }} />
+                    <span className="text-white font-bold text-sm">{t.name}</span>
                   </div>
-                  <span className="text-2xl font-bold text-green-400">{teamWins[t.name] ?? 0}</span>
+                  <span className="text-xl font-bold text-green-400">{teamWins[t.name] ?? 0}</span>
                 </div>
               ))}
             </div>
 
             {/* Lista */}
-            <div className="space-y-2 max-h-60 overflow-y-auto">
+            <div className="space-y-1.5 max-h-56 overflow-y-auto">
               {[...matchHistory].reverse().map((m: any) => (
-                <div key={m.id} className="bg-gray-700/50 rounded-lg p-3">
+                <div key={m.id} className="bg-gray-700/50 rounded-lg p-2.5">
                   <div className="flex justify-between items-center mb-1">
                     <span className="text-gray-400 text-xs">Partida #{m.matchNumber}</span>
                     <span className="text-yellow-400 text-xs">🏆 {m.winner}</span>
                   </div>
-                  <div className="grid grid-cols-3 gap-2 items-center text-center">
+                  <div className="grid grid-cols-3 gap-1 items-center text-center">
                     <div>
-                      <div className="text-white font-bold text-sm">{m.team1Name ?? "Time 1"}</div>
-                      <div className={`text-2xl font-bold ${m.score1 > m.score2 ? "text-green-400" : "text-gray-500"}`}>{m.score1}</div>
+                      <div className="text-white font-bold text-xs">{m.team1Name ?? "Time 1"}</div>
+                      <div className={`text-xl font-bold ${m.score1 > m.score2 ? "text-green-400" : "text-gray-500"}`}>{m.score1}</div>
                     </div>
-                    <div className="text-gray-500 font-bold">×</div>
+                    <div className="text-gray-500 font-bold text-sm">×</div>
                     <div>
-                      <div className="text-white font-bold text-sm">{m.team2Name ?? "Time 2"}</div>
-                      <div className={`text-2xl font-bold ${m.score2 > m.score1 ? "text-green-400" : "text-gray-500"}`}>{m.score2}</div>
+                      <div className="text-white font-bold text-xs">{m.team2Name ?? "Time 2"}</div>
+                      <div className={`text-xl font-bold ${m.score2 > m.score1 ? "text-green-400" : "text-gray-500"}`}>{m.score2}</div>
                     </div>
                   </div>
                 </div>
@@ -398,7 +398,7 @@ export default function PlayPage() {
               <button
                 onClick={handleStartMatch}
                 disabled={saving}
-                className="btn-primary w-full py-4 rounded-xl text-white font-bold text-lg animate-pulse"
+                className="btn-primary w-full py-3 sm:py-4 rounded-xl text-white font-bold text-base sm:text-lg animate-pulse"
               >
                 ▶ {matchHistory.length === 0 ? "INICIAR PRIMEIRA PARTIDA" : "INICIAR PRÓXIMA PARTIDA"}
               </button>
@@ -406,7 +406,7 @@ export default function PlayPage() {
             <button
               onClick={handleFinishGame}
               disabled={saving}
-              className="w-full py-4 rounded-xl bg-red-500 hover:bg-red-600 text-white font-bold text-lg"
+              className="w-full py-3 sm:py-4 rounded-xl bg-red-500 hover:bg-red-600 text-white font-bold text-base sm:text-lg"
             >
               🏁 FINALIZAR JOGO
             </button>
@@ -415,7 +415,7 @@ export default function PlayPage() {
       </div>
 
       {toast && (
-        <div className={`fixed top-4 right-4 px-5 py-3 rounded-lg text-white z-50 shadow-lg animate-slideIn ${
+        <div className={`fixed top-4 right-4 left-4 sm:left-auto px-4 py-3 rounded-lg text-white z-50 shadow-lg animate-slideIn text-sm ${
           toast.type === "error" ? "bg-red-500" : "bg-green-500"
         }`}>
           {toast.msg}

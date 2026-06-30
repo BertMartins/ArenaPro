@@ -52,24 +52,24 @@ export default function UsersAdminPage() {
   });
 
   return (
-    <div className="p-6 space-y-6">
-      <h1 className="text-3xl font-bold text-white">USUÁRIOS</h1>
-      <p className="text-sm text-gray-400 mb-4">Gerenciar jogadores da plataforma</p>
+    <div className="p-3 sm:p-5 space-y-4 pb-24 max-w-2xl mx-auto">
+      <h1 className="text-2xl sm:text-3xl font-bold text-white">USUÁRIOS</h1>
+      <p className="text-xs sm:text-sm text-gray-400">Gerenciar jogadores da plataforma</p>
 
       {/* FILTROS */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3">
         <input
           type="text"
           placeholder="Buscar usuário..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="bg-[#111827] text-white py-3 px-4 rounded-lg border border-white/10 focus:border-orange-400 outline-none"
+          className="bg-[#111827] text-white py-2.5 px-3 rounded-lg border border-white/10 focus:border-orange-400 outline-none text-sm"
         />
 
         <select
           value={roleFilter}
           onChange={(e) => setRoleFilter(e.target.value)}
-          className="bg-[#111827] text-white py-3 px-4 rounded-lg border border-white/10"
+          className="bg-[#111827] text-white py-2.5 px-3 rounded-lg border border-white/10 text-sm"
         >
           <option value="all">Todos os perfis</option>
           <option value="admin">Admins</option>
@@ -79,7 +79,7 @@ export default function UsersAdminPage() {
         <select
           value={typeFilter}
           onChange={(e) => setTypeFilter(e.target.value)}
-          className="bg-[#111827] text-white py-3 px-4 rounded-lg border border-white/10"
+          className="bg-[#111827] text-white py-2.5 px-3 rounded-lg border border-white/10 text-sm"
         >
           <option value="all">Todos os tipos</option>
           <option value="monthly">Mensalistas</option>

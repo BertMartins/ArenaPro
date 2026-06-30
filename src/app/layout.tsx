@@ -4,11 +4,17 @@ import { ToastProvider } from "@/components/ui/ToastProvider";
 export const metadata = {
   title: "BolinhaClub",
   description: "Sistema de Gestão de Jogos",
-  
   icons: {
-    icon: "/logo.png",    
-    apple: "/logo.png",        
+    icon: "/logo.png",
+    apple: "/logo.png",
   },
+};
+
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  viewportFit: "cover",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

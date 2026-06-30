@@ -92,3 +92,16 @@ body {
   align-items: center;
   gap: 4px;
 }
+
+/* Safe area padding for iPhone notch */
+.pb-nav {
+  padding-bottom: calc(80px + env(safe-area-inset-bottom, 0px));
+}
+
+/* Centraliza conteúdo no desktop sem quebrar mobile */
+.content-wrap {
+  max-width: 640px;
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
+}

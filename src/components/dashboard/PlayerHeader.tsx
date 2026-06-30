@@ -18,52 +18,49 @@ export default function PlayerHeader() {
   return (
     <header className="rounded-b-3xl overflow-hidden shadow-md">
       <div
-        className="p-6 text-white"
+        className="p-4 sm:p-6 text-white"
         style={{ background: "linear-gradient(90deg, #ff7a18, #ff9e32)" }}
       >
         {/* TOP */}
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-2xl">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/20 flex items-center justify-center text-xl sm:text-2xl">
               🏐
             </div>
-
             <div>
-              <div className="font-bold text-lg">{stats.name}</div>
-              <div className="text-sm text-white/80">
-                🏆 {stats.titles} Títulos
-              </div>
+              <div className="font-bold text-base sm:text-lg leading-tight">{stats.name}</div>
+              <div className="text-xs sm:text-sm text-white/80">🏆 {stats.titles} Títulos</div>
             </div>
           </div>
 
           <button
-            className="text-white text-xl bg-white/20 hover:bg-white/30 p-2 rounded-lg"
+            className="text-white bg-white/20 hover:bg-white/30 p-2 sm:p-3 rounded-lg"
             onClick={async () => {
               await fetch("/api/auth/logout", { method: "POST" });
               window.location.href = "/login";
             }}
           >
-            <FaSignOutAlt size={20} />
+            <FaSignOutAlt size={18} />
           </button>
         </div>
 
         {/* CARDS */}
-        <div className="grid grid-cols-3 gap-4">
-          <div className="rounded-xl bg-white/10 backdrop-blur py-6 flex flex-col items-center">
-            <div className="w-12 h-12 bg-purple-600/40 rounded-full flex items-center justify-center text-xl font-bold">
+        <div className="grid grid-cols-3 gap-2 sm:gap-3">
+          <div className="rounded-xl bg-white/10 backdrop-blur py-3 sm:py-4 flex flex-col items-center">
+            <div className="w-10 h-10 sm:w-11 sm:h-11 bg-purple-600/40 rounded-full flex items-center justify-center text-lg sm:text-xl font-bold">
               {stats.level}
             </div>
-            <span className="text-sm mt-2 text-white/90">Nível</span>
+            <span className="text-xs mt-1 sm:mt-2 text-white/90">Nível</span>
           </div>
 
-          <div className="rounded-xl bg-white/10 backdrop-blur py-6 flex flex-col items-center">
-            <span className="text-3xl font-bold">{stats.wins}</span>
-            <span className="text-sm mt-2 text-white/90">Vitórias</span>
+          <div className="rounded-xl bg-white/10 backdrop-blur py-3 sm:py-4 flex flex-col items-center">
+            <span className="text-2xl sm:text-3xl font-bold">{stats.wins}</span>
+            <span className="text-xs mt-1 sm:mt-2 text-white/90">Vitórias</span>
           </div>
 
-          <div className="rounded-xl bg-white/10 backdrop-blur py-6 flex flex-col items-center">
-            <span className="text-3xl font-bold">{stats.rate}%</span>
-            <span className="text-sm mt-2 text-white/90">Taxa</span>
+          <div className="rounded-xl bg-white/10 backdrop-blur py-3 sm:py-4 flex flex-col items-center">
+            <span className="text-2xl sm:text-3xl font-bold">{stats.rate}%</span>
+            <span className="text-xs mt-1 sm:mt-2 text-white/90">Taxa</span>
           </div>
         </div>
       </div>
