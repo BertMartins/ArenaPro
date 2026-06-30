@@ -9,7 +9,7 @@ export default function Home() {
         {/* Logo */}
         <div className="flex flex-col items-center gap-2">
           <div className="text-7xl">🏐</div>
-          <h1 className="text-5xl font-extrabold tracking-tight">ArenaPro</h1>
+          <h1 className="text-5xl font-extrabold tracking-tight">BolinhaClub</h1>
           <p className="text-zinc-400 text-sm">Gestão moderna de jogos esportivos</p>
         </div>
 
@@ -20,7 +20,7 @@ export default function Home() {
           </h2>
 
           <p className="text-lg text-zinc-300 leading-relaxed">
-            Com o ArenaPro você cria jogos, monta times automaticamente,
+            Com o BolinhaClub você cria jogos, monta times automaticamente,
             gerencia mensalidades, controla visitantes e ainda acompanha
             placares ao vivo — tudo de forma simples e rápida.
           </p>
@@ -36,7 +36,7 @@ export default function Home() {
 
         {/* Rodapé */}
         <p className="text-xs text-zinc-500 pt-6">
-          Desenvolvido por Heberte • ArenaPro © {new Date().getFullYear()}
+          Desenvolvido por Heberte • BolinhaClub © {new Date().getFullYear()}
         </p>
       </main>
     </div>

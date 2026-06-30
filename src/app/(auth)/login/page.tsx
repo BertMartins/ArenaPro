@@ -44,7 +44,7 @@ export default function LoginPage() {
       {/* LOGO */}
       <div className="text-center mb-10 animate-fadeIn">
         <div className="inline-block text-6xl mb-4 animate-bounceSoft">🏐</div>
-        <h1 className="title-font font-bold text-5xl text-white">ARENA PRO</h1>
+        <h1 className="title-font font-bold text-5xl text-white">BOLINHACLUB</h1>
         <p className="text-gray-400 mt-1">Gestão Profissional de Jogos</p>
       </div>
 
