@@ -18,10 +18,10 @@ export async function GET(
       where: { gameId },
       include: {
         players: {
-          include: { user: true }
-        }
+          include: { user: { include: { stats: true } } },
+        },
       },
-      orderBy: { name: "asc" }
+      orderBy: { name: "asc" },
     });
 
     return NextResponse.json(teams);

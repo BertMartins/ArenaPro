@@ -52,34 +52,39 @@ export default function GameCard({
         />
       </div>
 
+      {/* Status em andamento */}
+      {game.status === "in_progress" && (
+        <div className="text-green-400 text-xs font-bold mt-2 flex items-center gap-1">
+          <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse inline-block" />
+          Jogo em Andamento
+        </div>
+      )}
+
       {/* AÇÕES */}
       <div className="mt-4 flex items-center gap-2">
-
-        {/* PARTICIPAR/SAIR */}
-        <GameJoinButton
-          gameId={game.id}
-          userIsInside={userIsInside}
-          refresh={refresh}
-        />
-
-        {/* ADMIN BUTTON */}
-        {mode === "admin" && (
-          <button
-            onClick={onView}
-            className="flex-1 py-3 rounded-lg font-bold bg-purple-600 hover:bg-purple-700 text-white text-lg"
-          >
-            Gerenciar
-          </button>
+        {game.status === "open" && (
+          <GameJoinButton
+            gameId={game.id}
+            userIsInside={userIsInside}
+            refresh={refresh}
+          />
         )}
 
-        {/* VISUALIZAR */}
+        {game.status === "in_progress" && (
+          <div className="flex-1 py-3 text-center text-green-300 text-sm border border-green-500 rounded-lg bg-green-500/10 font-bold">
+            Lista Fechada
+          </div>
+        )}
+
+        {/* VISUALIZAR / GERENCIAR */}
         <button
           onClick={onView}
-          className="w-12 h-12 rounded-lg bg-blue-500 hover:bg-blue-600 text-white flex items-center justify-center text-xl"
+          className={`py-3 rounded-lg font-bold text-white flex items-center justify-center gap-1 ${
+            mode === "admin" ? "flex-1 bg-blue-600 hover:bg-blue-700" : "w-12 h-12 bg-blue-500 hover:bg-blue-600"
+          }`}
         >
-          👁️
+          {mode === "admin" ? "👁️ Ver" : "👁️"}
         </button>
-
       </div>
     </div>
   );

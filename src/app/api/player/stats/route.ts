@@ -5,7 +5,7 @@ import { verifyToken } from "@/lib/jwt";
 export async function GET() {
   try {
     const token = await verifyToken();
-    if (!token || token.role !== "player")
+    if (!token)
       return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
 
     const user = await prisma.user.findUnique({

@@ -13,16 +13,16 @@ export async function POST(
     if (!token)
       return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
 
-    const game = await prisma.game.findUnique({
-      where: { id: gameId },
-      include: { players: true },
-    });
+    const [game, userRecord] = await Promise.all([
+      prisma.game.findUnique({ where: { id: gameId }, include: { players: true } }),
+      prisma.user.findUnique({ where: { id: token.id } }),
+    ]);
 
     if (!game)
       return NextResponse.json({ error: "Jogo não encontrado" }, { status: 404 });
 
-    if (game.players.length >= game.maxPlayers)
-      return NextResponse.json({ error: "Jogo cheio" }, { status: 400 });
+    if (game.status !== "open")
+      return NextResponse.json({ error: "Jogo não está aberto" }, { status: 400 });
 
     const exists = await prisma.gamePlayer.findFirst({
       where: { gameId, userId: token.id },
@@ -31,13 +31,30 @@ export async function POST(
     if (exists)
       return NextResponse.json({ error: "Você já está no jogo" }, { status: 400 });
 
+    const userPaymentType = userRecord?.paymentType ?? "monthly";
+
     await prisma.gamePlayer.create({
       data: {
         gameId,
         userId: token.id,
-        paymentType: "monthly",
+        paymentType: userPaymentType,
       },
     });
+
+    // Se for diarista, registrar R$15 na caixinha
+    if (userPaymentType === "daily" && userRecord) {
+      const gameDate = game.date;
+      await prisma.financialEntry.create({
+        data: {
+          date: gameDate,
+          type: "daily_fee",
+          gameId,
+          userId: token.id,
+          amount: 15,
+          note: `Diarista: ${userRecord.name}`,
+        },
+      });
+    }
 
     const updated = await prisma.game.findUnique({
       where: { id: gameId },

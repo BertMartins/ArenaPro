@@ -105,7 +105,7 @@ export async function GET() {
       include: {
         players: {
           include: {
-            user: true,
+            user: { include: { stats: true } },
           },
         },
       },

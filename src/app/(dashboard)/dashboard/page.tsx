@@ -97,7 +97,7 @@ export default function DashboardAdminPage() {
             <GameCard
               key={g.id}
               game={g}
-              currentUserId={user?.id || ""} 
+              currentUserId={user?.id || ""}
               mode="admin"
               onView={() => router.push(`/games/${g.id}`)}
               refresh={loadGames}

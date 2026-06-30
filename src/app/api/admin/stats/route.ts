@@ -33,6 +33,7 @@ export async function GET() {
       titles: user.stats?.titles ?? 0,
       level: user.stats?.level ?? 1,
       wins,
+      losses,
       rate,
     });
   } catch (err) {

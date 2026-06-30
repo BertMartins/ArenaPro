@@ -53,6 +53,32 @@ export async function POST(
       }
     });
 
+    // Update player stats (wins/losses)
+    const winnerTeamId = body.score1 > body.score2 ? body.team1Id : body.team2Id;
+    const loserTeamId = body.score1 > body.score2 ? body.team2Id : body.team1Id;
+
+    const [winnerPlayers, loserPlayers] = await Promise.all([
+      prisma.gameTeamPlayer.findMany({ where: { teamId: winnerTeamId } }),
+      prisma.gameTeamPlayer.findMany({ where: { teamId: loserTeamId } }),
+    ]);
+
+    await Promise.all([
+      ...winnerPlayers.map((p) =>
+        prisma.userStats.upsert({
+          where: { userId: p.userId },
+          create: { userId: p.userId, wins: 1, losses: 0, level: 1, titles: 0 },
+          update: { wins: { increment: 1 } },
+        })
+      ),
+      ...loserPlayers.map((p) =>
+        prisma.userStats.upsert({
+          where: { userId: p.userId },
+          create: { userId: p.userId, wins: 0, losses: 1, level: 1, titles: 0 },
+          update: { losses: { increment: 1 } },
+        })
+      ),
+    ]);
+
     return NextResponse.json({ ok: true, match });
   } catch (err) {
     console.error("Erro POST matches:", err);

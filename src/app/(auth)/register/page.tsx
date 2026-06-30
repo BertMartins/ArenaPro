@@ -7,6 +7,8 @@ export default function RegisterPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
+  const [paymentType, setPaymentType] = useState<"monthly" | "daily">("monthly");
+
   async function handleSubmit(e: any) {
     e.preventDefault();
     setLoading(true);
@@ -18,7 +20,7 @@ export default function RegisterPage() {
     const res = await fetch("/api/auth/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, email, password }),
+      body: JSON.stringify({ name, email, password, paymentType }),
     });
 
     const data = await res.json();
@@ -96,6 +98,39 @@ return (
               required
               className="custom-input w-full px-4 py-3 rounded-lg text-white bg-gray-800/40 border border-gray-700"
             />
+          </div>
+
+          {/* Tipo de Pagamento */}
+          <div>
+            <label className="block text-white font-medium mb-3">💳 Tipo de Pagamento</label>
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={() => setPaymentType("monthly")}
+                className={`p-4 rounded-lg border-2 text-center transition ${
+                  paymentType === "monthly"
+                    ? "border-orange-500 bg-orange-500/20"
+                    : "border-gray-600 bg-gray-800/40 hover:border-gray-500"
+                }`}
+              >
+                <div className="text-2xl mb-1">📅</div>
+                <div className="text-white font-bold text-sm">Mensalista</div>
+                <div className="text-gray-400 text-xs">Pagamento mensal</div>
+              </button>
+              <button
+                type="button"
+                onClick={() => setPaymentType("daily")}
+                className={`p-4 rounded-lg border-2 text-center transition ${
+                  paymentType === "daily"
+                    ? "border-blue-500 bg-blue-500/20"
+                    : "border-gray-600 bg-gray-800/40 hover:border-gray-500"
+                }`}
+              >
+                <div className="text-2xl mb-1">🎫</div>
+                <div className="text-white font-bold text-sm">Diarista</div>
+                <div className="text-gray-400 text-xs">Pagamento por jogo</div>
+              </button>
+            </div>
           </div>
 
           <button

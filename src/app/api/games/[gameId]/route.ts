@@ -17,11 +17,11 @@ export async function GET(
     const game = await prisma.game.findUnique({
       where: { id: gameId },
       include: {
-        players: { include: { user: true } },
+        players: { include: { user: { include: { stats: true } } } },
         teams: {
           include: {
             players: {
-              include: { user: true },
+              include: { user: { include: { stats: true } } },
             },
           },
         },

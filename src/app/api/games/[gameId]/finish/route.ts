@@ -30,12 +30,48 @@ export async function POST(
       );
     }
 
-    await prisma.game.update({
-      where: { id: gameId },
-      data: { status: "finished" },
+    // Find champion team (most wins in match history)
+    const matches = await prisma.matchHistory.findMany({ where: { gameId } });
+    const winCount: Record<string, number> = {};
+    matches.forEach((m) => { winCount[m.winner] = (winCount[m.winner] || 0) + 1; });
+
+    let championTeamName = "";
+    let maxWins = 0;
+    for (const [name, wins] of Object.entries(winCount)) {
+      if (wins > maxWins) { maxWins = wins; championTeamName = name; }
+    }
+
+    // Find champion team and its players
+    const championTeam = await prisma.gameTeam.findFirst({
+      where: { gameId, name: championTeamName },
+      include: { players: true },
     });
 
-    return NextResponse.json({ ok: true });
+    // Update titles for champion players
+    if (championTeam) {
+      await Promise.all(
+        championTeam.players.map((p) =>
+          prisma.userStats.upsert({
+            where: { userId: p.userId },
+            create: { userId: p.userId, wins: 0, losses: 0, level: 1, titles: 1 },
+            update: { titles: { increment: 1 } },
+          })
+        )
+      );
+    }
+
+    // Get first player of champion team as representative (for championId)
+    const firstChampionPlayer = championTeam?.players[0];
+
+    await prisma.game.update({
+      where: { id: gameId },
+      data: {
+        status: "finished",
+        championId: firstChampionPlayer?.userId ?? null,
+      },
+    });
+
+    return NextResponse.json({ ok: true, champion: championTeamName });
   } catch (err) {
     console.error("[FINISH]", err);
     return NextResponse.json(
