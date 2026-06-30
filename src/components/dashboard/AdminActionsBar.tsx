@@ -1,9 +1,18 @@
 "use client";
-
 import { useRouter } from "next/navigation";
+import { useNav } from "@/context/NavContext";
 
 export default function AdminActionsBar({ onCreate }: { onCreate: () => void }) {
+  const nav = useNav();
   const router = useRouter();
+
+  function goTo(view: "users" | "mensalistas" | "financeiro") {
+    if (nav) {
+      nav.pushView({ type: view });
+    } else {
+      router.push(`/dashboard/${view}`);
+    }
+  }
 
   return (
     <div className="space-y-3">
@@ -17,7 +26,7 @@ export default function AdminActionsBar({ onCreate }: { onCreate: () => void }) 
       <div className="grid grid-cols-3 gap-2">
         <button
           className="py-2 sm:py-3 rounded-xl bg-blue-500 text-white font-bold text-xs sm:text-sm flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-1"
-          onClick={() => router.push("/dashboard/users")}
+          onClick={() => goTo("users")}
         >
           <span>👥</span>
           <span>USUÁRIOS</span>
@@ -25,7 +34,7 @@ export default function AdminActionsBar({ onCreate }: { onCreate: () => void }) 
 
         <button
           className="py-2 sm:py-3 rounded-xl bg-green-600 text-white font-bold text-xs sm:text-sm flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-1"
-          onClick={() => router.push("/dashboard/mensalistas")}
+          onClick={() => goTo("mensalistas")}
         >
           <span>💳</span>
           <span>MENSALISTA</span>
@@ -33,7 +42,7 @@ export default function AdminActionsBar({ onCreate }: { onCreate: () => void }) 
 
         <button
           className="py-2 sm:py-3 rounded-xl bg-purple-600 text-white font-bold text-xs sm:text-sm flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-1 leading-tight"
-          onClick={() => router.push("/dashboard/financeiro")}
+          onClick={() => goTo("financeiro")}
         >
           <span>📈</span>
           <span>FINANCEIRO</span>
