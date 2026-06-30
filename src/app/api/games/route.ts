@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { verifyToken } from "@/lib/jwt";
 import { parseLocalDate, todayLocal, formatDateBR } from "@/lib/date";
+import { reconcileGame } from "@/lib/gameReconcile";
 
 // Tipagem do payload de criação
 type CreatePayload = {
@@ -10,6 +11,9 @@ type CreatePayload = {
   teamSize: number;
   pointsPerMatch: number;
   twoWinsRule?: boolean;
+  type?: string;
+  paymentWindowStart?: string;
+  paymentDeadlineMinutes?: number;
 };
 
 function isValidDateString(s: any) {
@@ -17,6 +21,12 @@ function isValidDateString(s: any) {
   const p = s.split("-");
   return p.length === 3 && p[0].length === 4;
 }
+
+function isValidTimeString(s: any) {
+  return typeof s === "string" && /^([01]\d|2[0-3]):([0-5]\d)$/.test(s);
+}
+
+const GAME_TYPES = ["monthly_priority", "general"] as const;
 
 // =============================================
 // POST → Criar jogo
@@ -45,6 +55,9 @@ export async function POST(req: Request) {
       teamSize: Number(body.teamSize),
       pointsPerMatch: Number(body.pointsPerMatch),
       twoWinsRule: Boolean(body.twoWinsRule),
+      type: body.type ?? "monthly_priority",
+      paymentWindowStart: body.paymentWindowStart ?? "12:00",
+      paymentDeadlineMinutes: Number(body.paymentDeadlineMinutes ?? 60),
     };
 
     // validações
@@ -57,6 +70,24 @@ export async function POST(req: Request) {
     ) {
       return NextResponse.json(
         { error: "Campos obrigatórios inválidos" },
+        { status: 400 }
+      );
+    }
+
+    if (!GAME_TYPES.includes(payload.type as any)) {
+      return NextResponse.json({ error: "Tipo de jogo inválido" }, { status: 400 });
+    }
+
+    if (!isValidTimeString(payload.paymentWindowStart)) {
+      return NextResponse.json(
+        { error: "Horário de início de pagamento inválido" },
+        { status: 400 }
+      );
+    }
+
+    if (!payload.paymentDeadlineMinutes || payload.paymentDeadlineMinutes <= 0) {
+      return NextResponse.json(
+        { error: "Intervalo de pagamento inválido" },
         { status: 400 }
       );
     }
@@ -80,6 +111,9 @@ export async function POST(req: Request) {
         teamSize: payload.teamSize,
         pointsPerMatch: payload.pointsPerMatch,
         twoWinsRule: payload.twoWinsRule ?? true,
+        type: payload.type as any,
+        paymentWindowStart: payload.paymentWindowStart!,
+        paymentDeadlineMinutes: payload.paymentDeadlineMinutes!,
         createdById: user.id,
       },
     });
@@ -100,6 +134,14 @@ export async function POST(req: Request) {
 // GET → Listar jogos futuros
 export async function GET() {
   try {
+    const openGameIds = await prisma.game.findMany({
+      where: { status: "open" },
+      select: { id: true },
+    });
+    for (const g of openGameIds) {
+      await reconcileGame(g.id);
+    }
+
     const games = await prisma.game.findMany({
       orderBy: { date: "asc" },
       include: {

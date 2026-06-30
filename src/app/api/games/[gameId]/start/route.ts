@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { verifyToken } from "@/lib/jwt";
+import { reconcileGame } from "@/lib/gameReconcile";
 
 const TEAM_CONFIGS = [
   { name: "Vermelho", color: "#EF4444" },
@@ -21,6 +22,8 @@ export async function POST(
       return NextResponse.json({ error: "Acesso negado" }, { status: 401 });
     }
 
+    await reconcileGame(gameId);
+
     const game = await prisma.game.findUnique({
       where: { id: gameId },
       include: {
@@ -39,10 +42,11 @@ export async function POST(
       return NextResponse.json({ error: "Jogo já foi iniciado" }, { status: 400 });
     }
 
-    // Separar mensalistas (lista principal) de diaristas
-    const monthly = game.players.filter((p) => p.paymentType === "monthly");
-    const daily = game.players.filter((p) => p.paymentType === "daily");
-    const mainPlayers = [...monthly, ...daily].slice(0, game.maxPlayers);
+    // Lista principal já decidida pelo reconcileGame (prioridade/ordem de chegada + pagamentos confirmados)
+    const mainPlayers = game.players
+      .filter((p) => p.mainEnteredAt != null && !p.expired)
+      .sort((a, b) => a.mainEnteredAt!.getTime() - b.mainEnteredAt!.getTime())
+      .slice(0, game.maxPlayers);
 
     if (mainPlayers.length < game.teamSize * 2) {
       return NextResponse.json(

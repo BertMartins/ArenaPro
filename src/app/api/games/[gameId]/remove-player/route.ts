@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { verifyToken } from "@/lib/jwt";
+import { reconcileGame } from "@/lib/gameReconcile";
 
 export async function POST(
   request: NextRequest,
@@ -25,6 +26,13 @@ export async function POST(
     }
 
     await prisma.gamePlayer.delete({ where: { id: player.id } });
+
+    // Limpa qualquer lançamento financeiro confirmado para esse jogador neste jogo
+    await prisma.financialEntry.deleteMany({
+      where: { gameId, userId: playerId, type: "daily_fee" },
+    });
+
+    await reconcileGame(gameId);
 
     const updated = await prisma.game.findUnique({
       where: { id: gameId },

@@ -7,8 +7,42 @@ const LEVEL_COLORS: Record<number, string> = {
   4: "bg-purple-500", 5: "bg-yellow-500", 6: "bg-red-500",
 };
 
-export default function GameDetailPanel({ gameId }: { gameId: string }) {
-  const nav = useNav()!;
+function buildWindowStart(game: any): Date {
+  const d = new Date(game.date);
+  const [hh, mm] = (game.paymentWindowStart || "12:00").split(":").map(Number);
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate(), hh || 0, mm || 0, 0, 0);
+}
+
+function paymentDeadline(player: any, game: any): Date | null {
+  if (!player.mainEnteredAt) return null;
+  const windowStart = buildWindowStart(game);
+  const mainEnteredAt = new Date(player.mainEnteredAt);
+  const base = mainEnteredAt > windowStart ? mainEnteredAt : windowStart;
+  return new Date(base.getTime() + (game.paymentDeadlineMinutes ?? 60) * 60000);
+}
+
+function formatRemaining(deadline: Date): string {
+  const diffMs = deadline.getTime() - Date.now();
+  if (diffMs <= 0) return "Prazo esgotado";
+  const mins = Math.ceil(diffMs / 60000);
+  if (mins < 60) return `${mins} min restantes`;
+  const hours = Math.floor(mins / 60);
+  const rem = mins % 60;
+  return `${hours}h${rem > 0 ? ` ${rem}min` : ""} restantes`;
+}
+
+export default function GameDetailPanel({
+  gameId,
+  onBack,
+  onGoToPlay,
+}: {
+  gameId: string;
+  onBack?: () => void;
+  onGoToPlay?: () => void;
+}) {
+  const nav = useNav();
+  const goBack = onBack ?? (() => nav?.popView());
+  const goToPlay = onGoToPlay ?? (() => nav?.setTab("play"));
   const [game, setGame] = useState<any>(null);
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -57,6 +91,18 @@ export default function GameDetailPanel({ gameId }: { gameId: string }) {
     else showToast("Erro ao sair", "error");
   }
 
+  async function handleConfirmPayment(playerId: string) {
+    setSaving(true);
+    const res = await fetch(`/api/games/${gameId}/confirm-payment`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ playerId }),
+    });
+    setSaving(false);
+    if (res.ok) { showToast("Pagamento confirmado! 💰"); load(); }
+    else { const d = await res.json(); showToast(d.error || "Erro ao confirmar", "error"); }
+  }
+
   async function handleRemove(playerId: string) {
     if (!confirm("Remover este jogador?")) return;
     const res = await fetch(`/api/games/${gameId}/remove-player`, {
@@ -95,8 +141,8 @@ export default function GameDetailPanel({ gameId }: { gameId: string }) {
     setSaving(false);
     if (res.ok) {
       showToast("Jogo iniciado! Times criados 🎯");
-      nav.popView();
-      nav.setTab("play");
+      goBack();
+      goToPlay();
     } else {
       const d = await res.json();
       showToast(d.error || "Erro ao iniciar", "error");
@@ -115,18 +161,20 @@ export default function GameDetailPanel({ gameId }: { gameId: string }) {
     return (
       <div className="p-6 text-center text-gray-400">
         <p>Jogo não encontrado.</p>
-        <button onClick={() => nav.popView()} className="mt-4 text-orange-400">Voltar</button>
+        <button onClick={() => goBack()} className="mt-4 text-orange-400">Voltar</button>
       </div>
     );
   }
 
   const isAdmin = user?.role === "admin";
   const allPlayers = game.players ?? [];
-  const monthly = allPlayers.filter((p: any) => p.paymentType === "monthly");
-  const daily = allPlayers.filter((p: any) => p.paymentType === "daily");
-  const sortedAll = [...monthly, ...daily];
-  const mainPlayers = sortedAll.slice(0, game.maxPlayers);
-  const reservePlayers = sortedAll.slice(game.maxPlayers);
+  const mainPlayers = allPlayers
+    .filter((p: any) => p.mainEnteredAt && !p.expired)
+    .sort((a: any, b: any) => new Date(a.mainEnteredAt).getTime() - new Date(b.mainEnteredAt).getTime());
+  const reservePlayers = allPlayers
+    .filter((p: any) => !p.mainEnteredAt && !p.expired)
+    .sort((a: any, b: any) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+  const expiredPlayers = allPlayers.filter((p: any) => p.expired);
   const userInMain = mainPlayers.some((p: any) => p.userId === user?.id || p.user?.id === user?.id);
   const userInReserve = reservePlayers.some((p: any) => p.userId === user?.id || p.user?.id === user?.id);
   const userIsIn = userInMain || userInReserve;
@@ -136,7 +184,7 @@ export default function GameDetailPanel({ gameId }: { gameId: string }) {
   return (
     <div className="pb-24 animate-fadeIn max-w-2xl mx-auto">
       <div className="p-4 sm:p-6" style={{ background: "linear-gradient(135deg, #1E40AF 0%, #3B82F6 100%)" }}>
-        <button onClick={() => nav.popView()}
+        <button onClick={() => goBack()}
           className="text-white mb-3 hover:bg-white/20 px-3 py-1.5 rounded-lg transition text-sm">
           ← Voltar
         </button>
@@ -171,6 +219,15 @@ export default function GameDetailPanel({ gameId }: { gameId: string }) {
               🏆 Regra "Ganhou 2 Sai" ativa
             </div>
           )}
+          <div className="mt-2 bg-cyan-500/10 border border-cyan-500/40 rounded-lg p-2.5 text-xs text-cyan-200">
+            <div className="font-bold text-cyan-300 mb-1">
+              {game.type === "general" ? "📋 Tipo: Geral (ordem de chegada)" : "📋 Tipo: Mensalista (prioridade)"}
+            </div>
+            <div>
+              Contagem de pagamento a partir das <strong>{game.paymentWindowStart}</strong>, prazo de{" "}
+              <strong>{game.paymentDeadlineMinutes} min</strong> para confirmação.
+            </div>
+          </div>
         </div>
 
         <div className="glass-card rounded-xl p-3 sm:p-4">
@@ -209,26 +266,41 @@ export default function GameDetailPanel({ gameId }: { gameId: string }) {
               const u = getUser(p);
               const uid = getUserId(p);
               const lvl = u.stats?.level ?? u.level ?? 1;
+              const deadline = p.paymentType === "daily" && !p.paid ? paymentDeadline(p, game) : null;
               return (
-                <div key={uid + i} className="flex items-center justify-between bg-gray-700/50 rounded-lg p-3">
-                  <div className="flex items-center gap-3">
-                    <span className="text-gray-400 font-bold w-6 text-sm">#{i + 1}</span>
-                    <span className="text-xl">{u.photo ?? "🏐"}</span>
-                    <div>
-                      <div className="text-white font-medium text-sm">
-                        {u.name}
-                        {u.role === "visitor" && <span className="text-yellow-400 text-xs ml-2">(Visitante)</span>}
-                        {p.paymentType === "monthly" && <span className="text-green-400 text-xs ml-2">💰</span>}
+                <div key={uid + i} className="bg-gray-700/50 rounded-lg p-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <span className="text-gray-400 font-bold w-6 text-sm">#{i + 1}</span>
+                      <span className="text-xl">{u.photo ?? "🏐"}</span>
+                      <div>
+                        <div className="text-white font-medium text-sm">
+                          {u.name}
+                          {u.role === "visitor" && <span className="text-yellow-400 text-xs ml-2">(Visitante)</span>}
+                          {p.paymentType === "monthly" && <span className="text-green-400 text-xs ml-2">💰</span>}
+                          {p.paymentType === "daily" && p.paid && <span className="text-green-400 text-xs ml-2">✅ Pago</span>}
+                        </div>
+                        <div className="text-gray-400 text-xs">{u.stats?.wins ?? 0}V / {u.stats?.losses ?? 0}D</div>
                       </div>
-                      <div className="text-gray-400 text-xs">{u.stats?.wins ?? 0}V / {u.stats?.losses ?? 0}D</div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className={`w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-bold ${LEVEL_COLORS[lvl] ?? "bg-gray-500"}`}>{lvl}</span>
+                      {isAdmin && game.status === "open" && (
+                        <button onClick={() => handleRemove(uid)} className="text-red-400 hover:text-red-300 p-1 text-lg">×</button>
+                      )}
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <span className={`w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-bold ${LEVEL_COLORS[lvl] ?? "bg-gray-500"}`}>{lvl}</span>
-                    {isAdmin && game.status === "open" && (
-                      <button onClick={() => handleRemove(uid)} className="text-red-400 hover:text-red-300 p-1 text-lg">×</button>
-                    )}
-                  </div>
+                  {deadline && (
+                    <div className="mt-2 flex items-center justify-between gap-2 bg-yellow-500/10 border border-yellow-500/40 rounded-lg px-2.5 py-1.5">
+                      <span className="text-yellow-300 text-xs">⏱ {formatRemaining(deadline)} p/ confirmar pagamento</span>
+                      {isAdmin && (
+                        <button onClick={() => handleConfirmPayment(uid)} disabled={saving}
+                          className="bg-green-600 hover:bg-green-500 px-2.5 py-1 rounded-lg text-white text-xs font-bold whitespace-nowrap">
+                          Confirmar Pagamento
+                        </button>
+                      )}
+                    </div>
+                  )}
                 </div>
               );
             })}
@@ -239,7 +311,9 @@ export default function GameDetailPanel({ gameId }: { gameId: string }) {
           <div className="glass-card rounded-xl p-4 border-2 border-yellow-500/40">
             <h3 className="text-white font-bold text-base mb-2">⏳ Suplentes ({reservePlayers.length})</h3>
             <div className="bg-yellow-500/10 border border-yellow-500/40 rounded-lg p-3 mb-3 text-center text-xs text-yellow-300">
-              Diaristas que entrarão na lista se houver vagas após 15h
+              {game.type === "general"
+                ? `Sobem para a lista se o pagamento de alguém expirar após as ${game.paymentWindowStart}`
+                : `Diaristas entram na lista se houver vaga a partir das ${game.paymentWindowStart}`}
             </div>
             <div className="space-y-2">
               {reservePlayers.map((p: any, i: number) => {
@@ -265,6 +339,29 @@ export default function GameDetailPanel({ gameId }: { gameId: string }) {
                         <button onClick={() => handleRemove(uid)} className="text-red-400 hover:text-red-300 p-1 text-lg">×</button>
                       )}
                     </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {isAdmin && expiredPlayers.length > 0 && (
+          <div className="glass-card rounded-xl p-4 border-2 border-red-500/40">
+            <h3 className="text-white font-bold text-base mb-2">🚫 Vagas perdidas por falta de pagamento ({expiredPlayers.length})</h3>
+            <div className="space-y-2">
+              {expiredPlayers.map((p: any, i: number) => {
+                const u = getUser(p);
+                const uid = getUserId(p);
+                return (
+                  <div key={uid + i} className="flex items-center justify-between bg-gray-700/50 rounded-lg p-3">
+                    <div className="flex items-center gap-3">
+                      <span className="text-xl opacity-60">{u.photo ?? "🏐"}</span>
+                      <div className="text-gray-300 text-sm">{u.name}</div>
+                    </div>
+                    {game.status === "open" && (
+                      <button onClick={() => handleRemove(uid)} className="text-red-400 hover:text-red-300 p-1 text-lg">×</button>
+                    )}
                   </div>
                 );
               })}
@@ -301,7 +398,7 @@ export default function GameDetailPanel({ gameId }: { gameId: string }) {
         )}
 
         {game.status === "in_progress" && (
-          <button onClick={() => { nav.popView(); nav.setTab("play"); }}
+          <button onClick={() => { goBack(); goToPlay(); }}
             className="w-full py-3 sm:py-4 rounded-xl bg-green-500 hover:bg-green-400 text-white font-bold text-base sm:text-lg animate-pulse">
             ▶ IR PARA O JOGO
           </button>

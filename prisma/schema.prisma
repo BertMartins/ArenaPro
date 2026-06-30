@@ -68,9 +68,11 @@ model Game {
   maxPlayers  Int
   teamSize    Int
   status      GameStatus  @default(open)
+  type        GameType    @default(monthly_priority)
   twoWinsRule Boolean     @default(true)
   pointsPerMatch Int      @default(25)
-  cutoffTime  String      @default("15:00")
+  paymentWindowStart    String @default("12:00")
+  paymentDeadlineMinutes Int   @default(60)
   createdAt   DateTime    @default(now())
 
   createdById String
@@ -93,6 +95,11 @@ enum GameStatus {
   finished
 }
 
+enum GameType {
+  monthly_priority
+  general
+}
+
 //
 // ==============================
 //  GAME PLAYER
@@ -103,6 +110,11 @@ model GamePlayer {
   gameId     String
   timestamp  DateTime    @default(now())
   paymentType PaymentType @default(monthly)
+
+  mainEnteredAt DateTime?
+  paid          Boolean   @default(false)
+  paidAt        DateTime?
+  expired       Boolean   @default(false)
 
   user User @relation(fields: [userId], references: [id])
   game Game @relation(fields: [gameId], references: [id])

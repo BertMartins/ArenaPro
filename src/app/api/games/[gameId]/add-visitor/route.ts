@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { verifyToken } from "@/lib/jwt";
+import { reconcileGame } from "@/lib/gameReconcile";
 
 export async function POST(
   request: NextRequest,
@@ -42,19 +43,7 @@ export async function POST(
       data: { gameId, userId: visitor.id, paymentType: "daily" },
     });
 
-    // Registrar R$15 na caixinha
-    const gameDate = game.date;
-    const entryMonth = new Date(gameDate);
-    await prisma.financialEntry.create({
-      data: {
-        date: entryMonth,
-        type: "daily_fee",
-        gameId,
-        userId: visitor.id,
-        amount: 15,
-        note: `Visitante: ${name}`,
-      },
-    });
+    await reconcileGame(gameId);
 
     const updated = await prisma.game.findUnique({
       where: { id: gameId },

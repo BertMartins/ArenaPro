@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { verifyToken } from "@/lib/jwt";
+import { reconcileGame } from "@/lib/gameReconcile";
 
 export async function GET(
   request: NextRequest,
@@ -13,6 +14,8 @@ export async function GET(
     if (!token) {
       return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
     }
+
+    await reconcileGame(gameId);
 
     const game = await prisma.game.findUnique({
       where: { id: gameId },
