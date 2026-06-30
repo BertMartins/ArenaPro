@@ -3,13 +3,36 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
+const LEVEL_LABELS: Record<number, string> = {
+  1: "Aprendendo",
+  2: "Iniciante",
+  3: "Intermediário",
+  4: "Avançado",
+  5: "Expert",
+  6: "Muito experiente",
+};
+
+const LEVEL_COLORS: Record<number, string> = {
+  1: "from-gray-500 to-gray-400",
+  2: "from-green-600 to-green-400",
+  3: "from-blue-600 to-blue-400",
+  4: "from-purple-600 to-purple-400",
+  5: "from-yellow-500 to-yellow-300",
+  6: "from-red-600 to-red-400",
+};
+
 export default function RegisterPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [paymentType, setPaymentType] = useState<"monthly" | "daily">("monthly");
+  const [level, setLevel] = useState<number>(0);
 
   async function handleSubmit(e: any) {
     e.preventDefault();
+    if (level === 0) {
+      alert("Por favor, selecione seu nível de jogador.");
+      return;
+    }
     setLoading(true);
 
     const name = e.target.name.value;
@@ -19,7 +42,7 @@ export default function RegisterPage() {
     const res = await fetch("/api/auth/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, email, password, paymentType }),
+      body: JSON.stringify({ name, email, password, paymentType, level }),
     });
 
     const data = await res.json();
@@ -126,6 +149,38 @@ export default function RegisterPage() {
                   <div className="text-gray-400 text-xs">Pag. por jogo</div>
                 </button>
               </div>
+            </div>
+
+            {/* Nível do Jogador */}
+            <div>
+              <label className="block text-white font-medium mb-1 text-sm">
+                🏐 Qual é o seu nível como jogador?
+              </label>
+              <p className="text-gray-400 text-xs mb-3">
+                1 = ainda aprendendo &nbsp;·&nbsp; 6 = muita experiência
+              </p>
+              <div className="grid grid-cols-6 gap-2">
+                {([1, 2, 3, 4, 5, 6] as const).map((lvl) => (
+                  <button
+                    key={lvl}
+                    type="button"
+                    onClick={() => setLevel(lvl)}
+                    title={LEVEL_LABELS[lvl]}
+                    className={`flex flex-col items-center justify-center h-14 rounded-xl border-2 transition-all font-bold text-white text-lg bg-gradient-to-br ${LEVEL_COLORS[lvl]} ${
+                      level === lvl
+                        ? "border-white ring-2 ring-orange-400 scale-110 shadow-lg"
+                        : "border-transparent opacity-50 hover:opacity-80"
+                    }`}
+                  >
+                    {lvl}
+                  </button>
+                ))}
+              </div>
+              {level > 0 && (
+                <p className="text-center text-orange-300 text-xs mt-2 font-medium">
+                  Nível {level} — {LEVEL_LABELS[level]}
+                </p>
+              )}
             </div>
 
             <button

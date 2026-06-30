@@ -4,7 +4,7 @@ import bcrypt from "bcryptjs";
 
 export async function POST(req: Request) {
   try {
-    const { name, email, password, paymentType } = await req.json();
+    const { name, email, password, paymentType, level } = await req.json();
 
     const exists = await prisma.user.findUnique({ where: { email } });
     if (exists) return NextResponse.json({ error: "Email já cadastrado" }, { status: 400 });
@@ -17,6 +17,7 @@ export async function POST(req: Request) {
         email,
         password: hashed,
         role: "player",
+        level: typeof level === "number" && level >= 1 && level <= 6 ? level : 1,
         paymentType: paymentType === "daily" ? "daily" : "monthly",
         stats: { create: {} },
       },
