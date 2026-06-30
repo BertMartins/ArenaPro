@@ -40,18 +40,12 @@ export default function DashboardAdminPage() {
       const res = await fetch("/api/games");
       const data = await res.json();
       if (res.ok) {
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
+        const now = new Date();
+        const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
 
-        const filtered = data.filter((g: Game) => {
-          const d = new Date(g.date);
-          d.setHours(0, 0, 0, 0);
-          return d >= today;
-        });
-
-        filtered.sort(
-          (a: Game, b: Game) => +new Date(a.date) - +new Date(b.date)
-        );
+        const filtered = data
+          .filter((g: Game) => (g.date as string).substring(0, 10) >= todayStr)
+          .sort((a: Game, b: Game) => a.date.localeCompare(b.date));
 
         setGames(filtered);
       } else {

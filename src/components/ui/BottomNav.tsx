@@ -25,7 +25,7 @@ export default function BottomNav({ active }: { active: string }) {
 
   const items = [
     { id: "home", label: "Início", icon: "fa-house", href: homeHref },
-    { id: "games", label: "Jogos", icon: "fa-calendar", href: homeHref },
+    { id: "games", label: "Jogos", icon: "fa-calendar", href: "/games" },
     { id: "play", label: "Play", icon: "fa-play-circle", href: "/play", badge: hasActiveGame },
     { id: "stats", label: "Stats", icon: "fa-chart-bar", href: "/stats" },
   ];
