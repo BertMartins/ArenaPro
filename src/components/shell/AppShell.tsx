@@ -30,7 +30,7 @@ function ShellInner({ role }: { role: "admin" | "player" }) {
       {subView?.type === "game-detail" && <GameDetailPanel gameId={subView.gameId} />}
       {subView?.type === "users" && <UsersPanel />}
       {subView?.type === "mensalistas" && <MensalistasPanel />}
-      {subView?.type === "financeiro" && <FinanceiroPanel />}
+      {subView?.type === "financeiro" && <FinanceiroPanel onClose={() => nav.popView()} />}
       {subView?.type === "voting" && <VotingPanel onClose={() => nav.popView()} />}
 
       <BottomNavShell />

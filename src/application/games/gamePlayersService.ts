@@ -36,7 +36,7 @@ export async function leaveGame(gameId: string, userId: string) {
 
   // Limpa qualquer lançamento financeiro confirmado para esse jogador neste jogo
   await prisma.financialEntry.deleteMany({
-    where: { gameId, userId, type: "daily_fee" },
+    where: { gameId, userId, category: "daily_fee" },
   });
 
   await reconcileGame(gameId);
@@ -91,7 +91,7 @@ export async function removePlayer(gameId: string, playerId: string) {
 
   // Limpa qualquer lançamento financeiro confirmado para esse jogador neste jogo
   await prisma.financialEntry.deleteMany({
-    where: { gameId, userId: playerId, type: "daily_fee" },
+    where: { gameId, userId: playerId, category: "daily_fee" },
   });
 
   await reconcileGame(gameId);
@@ -126,7 +126,7 @@ export async function confirmPayment(gameId: string, playerId: string) {
     });
 
     await prisma.financialEntry.deleteMany({
-      where: { gameId, userId: playerId, type: "daily_fee" },
+      where: { gameId, userId: playerId, category: "daily_fee" },
     });
   } else {
     await prisma.gamePlayer.update({
@@ -137,7 +137,8 @@ export async function confirmPayment(gameId: string, playerId: string) {
     await prisma.financialEntry.create({
       data: {
         date: player.game.date,
-        type: "daily_fee",
+        direction: "income",
+        category: "daily_fee",
         gameId,
         userId: playerId,
         amount: 15,

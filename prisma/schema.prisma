@@ -191,26 +191,41 @@ enum PaymentStatus {
 
 //
 // ==============================
-//  FINANCIAL (CAIXINHA)
+//  FINANCIAL (CAIXA DO CLUBE)
 // ==============================
 model FinancialEntry {
-  id        String   @id @default(cuid())
+  id        String             @id @default(cuid())
   date      DateTime
-  type      FinancialType
+  direction FinancialDirection
+  category  FinancialCategory
   gameId    String?
   userId    String?
   amount    Float
   note      String?
+  createdAt DateTime           @default(now())
 
   game Game? @relation(fields: [gameId], references: [id])
   user User? @relation(fields: [userId], references: [id])
 }
 
-enum FinancialType {
-  daily_fee      // visitantes / diaristas
-  arena_payment  // valor pago na quadra
-  adjustment     // correção manual
-  monthly_income // mensalistas (opcional)
+enum FinancialDirection {
+  income
+  expense
+}
+
+enum FinancialCategory {
+  monthly_fee // mensalidade paga por mensalista
+  daily_fee   // diária paga por diarista/visitante
+  expense     // gasto lançado pelo admin
+}
+
+model MonthlyFeeConfig {
+  id          String @id @default(cuid())
+  month       Int
+  year        Int
+  totalAmount Float
+
+  @@unique([month, year])
 }
 
 //

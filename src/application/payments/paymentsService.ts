@@ -8,7 +8,7 @@ function getMonthRange() {
 }
 
 export async function getMonthlyPayments() {
-  const { first, next, month, year } = getMonthRange();
+  const { month, year } = getMonthRange();
 
   const monthlyUsers = await prisma.user.findMany({
     where: { paymentType: "monthly" },
@@ -19,11 +19,11 @@ export async function getMonthlyPayments() {
     orderBy: { name: "asc" },
   });
 
-  const feeEntry = await prisma.financialEntry.findFirst({
-    where: { note: "fee_config", date: { gte: first, lt: next } },
+  const feeConfig = await prisma.monthlyFeeConfig.findUnique({
+    where: { month_year: { month, year } },
   });
 
-  const feeTotal = feeEntry?.amount ?? 0;
+  const feeTotal = feeConfig?.totalAmount ?? 0;
   const feePerPerson = monthlyUsers.length > 0 ? feeTotal / monthlyUsers.length : 0;
 
   return {
@@ -43,27 +43,13 @@ export async function getMonthlyPayments() {
 }
 
 export async function setMonthlyFee(feeTotal: number) {
-  const { first, next } = getMonthRange();
+  const { month, year } = getMonthRange();
 
-  const existing = await prisma.financialEntry.findFirst({
-    where: { note: "fee_config", date: { gte: first, lt: next } },
+  await prisma.monthlyFeeConfig.upsert({
+    where: { month_year: { month, year } },
+    update: { totalAmount: Number(feeTotal) },
+    create: { month, year, totalAmount: Number(feeTotal) },
   });
-
-  if (existing) {
-    await prisma.financialEntry.update({
-      where: { id: existing.id },
-      data: { amount: Number(feeTotal) },
-    });
-  } else {
-    await prisma.financialEntry.create({
-      data: {
-        date: first,
-        type: "adjustment",
-        amount: Number(feeTotal),
-        note: "fee_config",
-      },
-    });
-  }
 }
 
 export async function toggleMonthlyPayment(userId: string) {
@@ -79,9 +65,9 @@ export async function toggleMonthlyPayment(userId: string) {
       data: { status: "pending", paidAt: null },
     });
 
-    // Remover entrada financeira correspondente
+    // Remover lançamento de caixa correspondente
     await prisma.financialEntry.deleteMany({
-      where: { type: "arena_payment", userId, date: { gte: first, lt: next } },
+      where: { direction: "income", category: "monthly_fee", userId, date: { gte: first, lt: next } },
     });
 
     return { hasPaid: false };
@@ -100,23 +86,24 @@ export async function toggleMonthlyPayment(userId: string) {
   }
 
   // Calcular valor por pessoa
-  const feeEntry = await prisma.financialEntry.findFirst({
-    where: { note: "fee_config", date: { gte: first, lt: next } },
+  const feeConfig = await prisma.monthlyFeeConfig.findUnique({
+    where: { month_year: { month, year } },
   });
   const monthlyCount = await prisma.user.count({ where: { paymentType: "monthly" } });
-  const feeTotal = feeEntry?.amount ?? 0;
+  const feeTotal = feeConfig?.totalAmount ?? 0;
   const feePerPerson = monthlyCount > 0 ? feeTotal / monthlyCount : 0;
 
-  // Criar entrada financeira (arena_payment) se não existir
-  const existingArena = await prisma.financialEntry.findFirst({
-    where: { type: "arena_payment", userId, date: { gte: first, lt: next } },
+  // Criar lançamento de caixa (income/monthly_fee) se não existir
+  const existingEntry = await prisma.financialEntry.findFirst({
+    where: { direction: "income", category: "monthly_fee", userId, date: { gte: first, lt: next } },
   });
 
-  if (!existingArena && feePerPerson > 0) {
+  if (!existingEntry && feePerPerson > 0) {
     await prisma.financialEntry.create({
       data: {
         date: new Date(),
-        type: "arena_payment",
+        direction: "income",
+        category: "monthly_fee",
         userId,
         amount: feePerPerson,
         note: `Mensalidade ${month}/${year}`,
