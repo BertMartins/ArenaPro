@@ -1,25 +1,13 @@
 import { NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
-import { verifyToken } from "@/lib/jwt";
+import { jsonError, jsonFromError } from "@/shared/http";
+import { getCurrentUser } from "@/application/auth/authService";
 
 export async function GET() {
   try {
-    const token = await verifyToken();
-    if (!token) {
-      return NextResponse.json({ error: "Não autenticado" }, { status: 401 });
-    }
-
-    const user = await prisma.user.findUnique({
-      where: { id: token.id },
-      select: { id: true, name: true, email: true, role: true, paymentType: true },
-    });
-
-    if (!user) {
-      return NextResponse.json({ error: "Usuário não encontrado" }, { status: 404 });
-    }
-
+    const user = await getCurrentUser();
+    if (!user) return jsonError("Não autenticado", 401);
     return NextResponse.json({ user });
-  } catch {
-    return NextResponse.json({ error: "Erro interno" }, { status: 500 });
+  } catch (err) {
+    return jsonFromError(err, "Erro interno");
   }
 }

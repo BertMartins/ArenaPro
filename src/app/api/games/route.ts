@@ -1,59 +1,24 @@
 import { NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
-import { verifyToken } from "@/lib/jwt";
-import { parseLocalDate, todayLocal, formatDateBR } from "@/lib/date";
-import { reconcileGame } from "@/lib/gameReconcile";
-
-// Tipagem do payload de criação
-type CreatePayload = {
-  date: string;
-  maxPlayers: number;
-  teamSize: number;
-  pointsPerMatch: number;
-  twoWinsRule?: boolean;
-  type?: string;
-  paymentWindowStart?: string;
-  paymentDeadlineMinutes?: number;
-  arenaName?: string;
-  arenaLocation?: string;
-  startTime?: string;
-  endTime?: string;
-};
-
-function isValidDateString(s: any) {
-  if (typeof s !== "string") return false;
-  const p = s.split("-");
-  return p.length === 3 && p[0].length === 4;
-}
-
-function isValidTimeString(s: any) {
-  return typeof s === "string" && /^([01]\d|2[0-3]):([0-5]\d)$/.test(s);
-}
-
-const GAME_TYPES = ["monthly_priority", "general"] as const;
+import { requireAuth, jsonError, jsonFromError } from "@/shared/http";
+import { createGame, listGames, type CreateGameInput } from "@/application/games/gamesService";
 
 // =============================================
 // POST → Criar jogo
 // =============================================
 export async function POST(req: Request) {
+  const auth = await requireAuth();
+  if (auth instanceof NextResponse) return auth;
+  if (auth.role !== "admin") return jsonError("Acesso negado", 403);
+
   try {
-    // autenticação
-    const user = await verifyToken();
-    if (!user)
-      return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
-
-    if (user.role !== "admin")
-      return NextResponse.json({ error: "Acesso negado" }, { status: 403 });
-
-    // parse do body
     let body: any;
     try {
       body = await req.json();
-    } catch (err) {
+    } catch {
       return NextResponse.json({ error: "JSON inválido" }, { status: 400 });
     }
 
-    const payload: CreatePayload = {
+    const payload: CreateGameInput = {
       date: body.date,
       maxPlayers: Number(body.maxPlayers),
       teamSize: Number(body.teamSize),
@@ -68,106 +33,22 @@ export async function POST(req: Request) {
       endTime: body.endTime?.trim() || undefined,
     };
 
-    // validações
-    if (
-      !payload.date ||
-      !isValidDateString(payload.date) ||
-      !payload.maxPlayers ||
-      !payload.teamSize ||
-      !payload.pointsPerMatch
-    ) {
-      return NextResponse.json(
-        { error: "Campos obrigatórios inválidos" },
-        { status: 400 }
-      );
-    }
-
-    if (!GAME_TYPES.includes(payload.type as any)) {
-      return NextResponse.json({ error: "Tipo de jogo inválido" }, { status: 400 });
-    }
-
-    if (!isValidTimeString(payload.paymentWindowStart)) {
-      return NextResponse.json(
-        { error: "Horário de início de pagamento inválido" },
-        { status: 400 }
-      );
-    }
-
-    if (!payload.paymentDeadlineMinutes || payload.paymentDeadlineMinutes <= 0) {
-      return NextResponse.json(
-        { error: "Intervalo de pagamento inválido" },
-        { status: 400 }
-      );
-    }
-
-    // ====== CORREÇÃO DE TIMEZONE ======
-    const gameDate = parseLocalDate(payload.date);
-    const today = todayLocal();
-
-    if (gameDate < today) {
-      return NextResponse.json(
-        { error: "Data inválida (não pode ser no passado)" },
-        { status: 400 }
-      );
-    }
-
-    // criar jogo
-    const created = await prisma.game.create({
-      data: {
-        date: gameDate,
-        maxPlayers: payload.maxPlayers,
-        teamSize: payload.teamSize,
-        pointsPerMatch: payload.pointsPerMatch,
-        twoWinsRule: payload.twoWinsRule ?? true,
-        type: payload.type as any,
-        paymentWindowStart: payload.paymentWindowStart!,
-        paymentDeadlineMinutes: payload.paymentDeadlineMinutes!,
-        arenaName: payload.arenaName,
-        arenaLocation: payload.arenaLocation,
-        startTime: payload.startTime,
-        endTime: payload.endTime,
-        createdById: user.id,
-      },
-    });
-
+    const created = await createGame(payload, auth.id);
     return NextResponse.json({ ok: true, game: created }, { status: 201 });
-  } catch (err: any) {
-    console.error("[/api/games] ERRO INTERNO", err);
-    return NextResponse.json(
-      { error: "Erro ao criar jogo" },
-      { status: 500 }
-    );
+  } catch (err) {
+    return jsonFromError(err, "Erro ao criar jogo");
   }
 }
 
 // =============================================
-// GET → Listar jogos futuros (hoje +)
+// GET → Listar jogos (reconcilia os abertos antes)
 // =============================================
-// GET → Listar jogos futuros
 export async function GET() {
   try {
-    const openGameIds = await prisma.game.findMany({
-      where: { status: "open" },
-      select: { id: true },
-    });
-    for (const g of openGameIds) {
-      await reconcileGame(g.id);
-    }
-
-    const games = await prisma.game.findMany({
-      orderBy: { date: "asc" },
-      include: {
-        players: {
-          include: {
-            user: { include: { stats: true } },
-          },
-        },
-      },
-    });
-
+    const games = await listGames();
     return NextResponse.json(games);
-  } catch (e) {
-    console.error("Erro ao listar jogos:", e);
+  } catch (err) {
+    console.error("Erro ao listar jogos:", err);
     return NextResponse.json({ error: "Erro interno" }, { status: 500 });
   }
 }

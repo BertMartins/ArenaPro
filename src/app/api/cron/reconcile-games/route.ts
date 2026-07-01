@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { reconcileAllOpenGames } from "@/lib/gameReconcile";
+import { reconcileAllOpenGames } from "@/application/games/gameReconcileService";
 
 // Rede de segurança diária (Vercel Hobby só permite cron 1x/dia).
 // A reconciliação "de verdade" acontece a cada leitura/escrita das rotas de

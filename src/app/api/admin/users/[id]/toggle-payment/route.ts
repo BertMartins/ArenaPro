@@ -1,31 +1,16 @@
 import { NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
-import { verifyToken } from "@/lib/jwt";
+import { requireAdmin, jsonFromError } from "@/shared/http";
+import { togglePaymentType } from "@/application/users/usersService";
 
 export async function POST(req: Request, context: { params: Promise<{ id: string }> }) {
+  const auth = await requireAdmin("Acesso negado");
+  if (auth instanceof NextResponse) return auth;
+
   try {
     const { id } = await context.params;
-    const admin = await verifyToken();
-    if (!admin || admin.role !== "admin")
-      return NextResponse.json({ error: "Acesso negado" }, { status: 401 });
-
-    const user = await prisma.user.findUnique({
-      where: { id },
-    });
-
-    if (!user)
-      return NextResponse.json({ error: "Usuário não encontrado" }, { status: 404 });
-
-    const newType = user.paymentType === "monthly" ? "daily" : "monthly";
-
-    await prisma.user.update({
-      where: { id },
-      data: { paymentType: newType },
-    });
-
-    return NextResponse.json({ ok: true, paymentType: newType });
+    const paymentType = await togglePaymentType(id);
+    return NextResponse.json({ ok: true, paymentType });
   } catch (err) {
-    console.error("[TOGGLE PAYMENT]", err);
-    return NextResponse.json({ error: "Erro ao trocar tipo" }, { status: 500 });
+    return jsonFromError(err, "Erro ao trocar tipo");
   }
 }

@@ -1,49 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
-import { verifyToken } from "@/lib/jwt";
-import { reconcileGame } from "@/lib/gameReconcile";
+import { requireAuth, jsonFromError } from "@/shared/http";
+import { leaveGame } from "@/application/games/gamePlayersService";
 
 export async function POST(
   request: NextRequest,
   context: { params: Promise<{ gameId: string }> }
 ) {
+  const auth = await requireAuth();
+  if (auth instanceof NextResponse) return auth;
+
   try {
     const { gameId } = await context.params;
-
-    const token = await verifyToken();
-    if (!token)
-      return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
-
-    const player = await prisma.gamePlayer.findFirst({
-      where: { gameId, userId: token.id },
-    });
-
-    if (!player)
-      return NextResponse.json(
-        { error: "Você não está no jogo" },
-        { status: 400 }
-      );
-
-    await prisma.gamePlayer.delete({ where: { id: player.id } });
-
-    // Limpa qualquer lançamento financeiro confirmado para esse jogador neste jogo
-    await prisma.financialEntry.deleteMany({
-      where: { gameId, userId: token.id, type: "daily_fee" },
-    });
-
-    await reconcileGame(gameId);
-
-    const updated = await prisma.game.findUnique({
-      where: { id: gameId },
-      include: { players: { include: { user: true } } },
-    });
-
-    return NextResponse.json({ ok: true, game: updated });
+    const game = await leaveGame(gameId, auth.id);
+    return NextResponse.json({ ok: true, game });
   } catch (err) {
-    console.error("[LEAVE]", err);
-    return NextResponse.json(
-      { error: "Erro ao sair do jogo" },
-      { status: 500 }
-    );
+    return jsonFromError(err, "Erro ao sair do jogo");
   }
 }

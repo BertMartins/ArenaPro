@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { clearTokenCookie } from "@/lib/jwt";
+import { logout } from "@/application/auth/authService";
 
 export async function POST() {
-  await clearTokenCookie();
+  await logout();
   return NextResponse.json({ ok: true });
 }

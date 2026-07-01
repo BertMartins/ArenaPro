@@ -1,31 +1,16 @@
 import { NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
-import { verifyToken } from "@/lib/jwt";
+import { requireAdmin, jsonFromError } from "@/shared/http";
+import { toggleRole } from "@/application/users/usersService";
 
 export async function POST(req: Request, context: { params: Promise<{ id: string }> }) {
+  const auth = await requireAdmin("Acesso negado");
+  if (auth instanceof NextResponse) return auth;
+
   try {
     const { id } = await context.params;
-    const admin = await verifyToken();
-    if (!admin || admin.role !== "admin")
-      return NextResponse.json({ error: "Acesso negado" }, { status: 401 });
-
-    const user = await prisma.user.findUnique({
-      where: { id },
-    });
-
-    if (!user)
-      return NextResponse.json({ error: "Usuário não encontrado" }, { status: 404 });
-
-    const newRole = user.role === "admin" ? "player" : "admin";
-
-    await prisma.user.update({
-      where: { id },
-      data: { role: newRole },
-    });
-
-    return NextResponse.json({ ok: true, role: newRole });
+    const role = await toggleRole(id);
+    return NextResponse.json({ ok: true, role });
   } catch (err) {
-    console.error("[TOGGLE ROLE]", err);
-    return NextResponse.json({ error: "Erro ao trocar perfil" }, { status: 500 });
+    return jsonFromError(err, "Erro ao trocar perfil");
   }
 }
