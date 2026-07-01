@@ -10,6 +10,7 @@ import GameDetailPanel from "./panels/GameDetailPanel";
 import UsersPanel from "./panels/UsersPanel";
 import MensalistasPanel from "./panels/MensalistasPanel";
 import FinanceiroPanel from "./panels/FinanceiroPanel";
+import VotingPanel from "./panels/VotingPanel";
 
 function ShellInner({ role }: { role: "admin" | "player" }) {
   const nav = useNav()!;
@@ -30,6 +31,7 @@ function ShellInner({ role }: { role: "admin" | "player" }) {
       {subView?.type === "users" && <UsersPanel />}
       {subView?.type === "mensalistas" && <MensalistasPanel />}
       {subView?.type === "financeiro" && <FinanceiroPanel />}
+      {subView?.type === "voting" && <VotingPanel onClose={() => nav.popView()} />}
 
       <BottomNavShell />
     </div>

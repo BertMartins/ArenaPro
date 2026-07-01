@@ -7,7 +7,8 @@ export type SubView =
   | { type: "game-detail"; gameId: string }
   | { type: "users" }
   | { type: "mensalistas" }
-  | { type: "financeiro" };
+  | { type: "financeiro" }
+  | { type: "voting" };
 
 interface NavCtx {
   tab: Tab;

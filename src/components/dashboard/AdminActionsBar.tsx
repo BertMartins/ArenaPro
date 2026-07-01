@@ -6,7 +6,7 @@ export default function AdminActionsBar({ onCreate }: { onCreate: () => void }) 
   const nav = useNav();
   const router = useRouter();
 
-  function goTo(view: "users" | "mensalistas" | "financeiro") {
+  function goTo(view: "users" | "mensalistas" | "financeiro" | "voting") {
     if (nav) {
       nav.pushView({ type: view });
     } else {
@@ -32,7 +32,7 @@ export default function AdminActionsBar({ onCreate }: { onCreate: () => void }) 
       </button>
 
       {/* AÇÕES SECUNDÁRIAS */}
-      <div className="grid grid-cols-3 gap-2">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
         {/* Usuários */}
         <button
           onClick={() => goTo("users")}
@@ -79,6 +79,22 @@ export default function AdminActionsBar({ onCreate }: { onCreate: () => void }) 
         >
           <i className="fas fa-chart-line text-base text-purple-400" />
           <span>FINANCEIRO</span>
+        </button>
+
+        {/* Votação */}
+        <button
+          onClick={() => goTo("voting")}
+          className="py-3 rounded-xl text-white font-bold text-xs sm:text-sm flex flex-col items-center gap-1 transition-all"
+          style={{
+            background: "linear-gradient(135deg, #7C2D12 0%, #FF6B35 100%)",
+            border: "1px solid rgba(255,107,53,0.35)",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.3)"
+          }}
+          onMouseEnter={e => (e.currentTarget.style.borderColor = "rgba(251,102,0,0.5)")}
+          onMouseLeave={e => (e.currentTarget.style.borderColor = "rgba(255,107,53,0.35)")}
+        >
+          <i className="fas fa-poll text-base" style={{ color: "#FFB347" }} />
+          <span>VOTAÇÃO</span>
         </button>
       </div>
     </div>

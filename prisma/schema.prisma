@@ -30,6 +30,10 @@ model User {
 
   teamPlayers GameTeamPlayer[]
   financialEntries FinancialEntry[]
+
+  votingSessionsCreated LevelVotingSession[] @relation("VotingSessionsCreated")
+  votesCast             LevelVote[]           @relation("VotesCast")
+  votesReceived         LevelVote[]           @relation("VotesReceived")
 }
 
 enum UserRole {
@@ -207,4 +211,43 @@ enum FinancialType {
   arena_payment  // valor pago na quadra
   adjustment     // correção manual
   monthly_income // mensalistas (opcional)
+}
+
+//
+// ==============================
+//  VOTAÇÃO DE NÍVEL
+// ==============================
+enum VotingStatus {
+  scheduled
+  open
+  closed
+}
+
+model LevelVotingSession {
+  id          String       @id @default(cuid())
+  title       String       @default("Votação de Nível")
+  startAt     DateTime
+  endAt       DateTime
+  status      VotingStatus @default(scheduled)
+  createdById String
+  createdBy   User         @relation("VotingSessionsCreated", fields: [createdById], references: [id])
+  createdAt   DateTime     @default(now())
+  closedAt    DateTime?
+
+  votes LevelVote[]
+}
+
+model LevelVote {
+  id        String   @id @default(cuid())
+  sessionId String
+  session   LevelVotingSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  voterId   String
+  voter     User     @relation("VotesCast", fields: [voterId], references: [id])
+  targetId  String
+  target    User     @relation("VotesReceived", fields: [targetId], references: [id])
+  level     Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([sessionId, voterId, targetId])
 }

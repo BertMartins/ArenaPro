@@ -18,7 +18,7 @@ export async function middleware(req: NextRequest) {
   const user = await verifyToken(); // ← AQUI é o conserto
 
   if (!user) {
-    return NextResponse.redirect(new URL("/login", req.url));
+    return NextResponse.redirect(new URL(`/login?next=${encodeURIComponent(pathname)}`, req.url));
   }
 
   // player tentando acessar área admin
@@ -36,6 +36,7 @@ export const config = {
     "/games/:path*",
     "/play",
     "/stats",
+    "/votacao/:path*",
     "/api/:path*",
   ],
 };
