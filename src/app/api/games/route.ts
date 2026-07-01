@@ -14,6 +14,8 @@ type CreatePayload = {
   type?: string;
   paymentWindowStart?: string;
   paymentDeadlineMinutes?: number;
+  arenaName?: string;
+  arenaLocation?: string;
 };
 
 function isValidDateString(s: any) {
@@ -58,6 +60,8 @@ export async function POST(req: Request) {
       type: body.type ?? "monthly_priority",
       paymentWindowStart: body.paymentWindowStart ?? "12:00",
       paymentDeadlineMinutes: Number(body.paymentDeadlineMinutes ?? 60),
+      arenaName: body.arenaName?.trim() || undefined,
+      arenaLocation: body.arenaLocation?.trim() || undefined,
     };
 
     // validações
@@ -114,6 +118,8 @@ export async function POST(req: Request) {
         type: payload.type as any,
         paymentWindowStart: payload.paymentWindowStart!,
         paymentDeadlineMinutes: payload.paymentDeadlineMinutes!,
+        arenaName: payload.arenaName,
+        arenaLocation: payload.arenaLocation,
         createdById: user.id,
       },
     });

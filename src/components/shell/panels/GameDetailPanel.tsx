@@ -230,6 +230,27 @@ export default function GameDetailPanel({
           </div>
         </div>
 
+        {(game.arenaName || game.arenaLocation) && (
+          <div className="glass-card rounded-xl p-4 flex items-start gap-3">
+            <span className="text-2xl">🏟️</span>
+            <div className="flex-1 min-w-0">
+              {game.arenaName && (
+                <div className="text-white font-bold text-sm">{game.arenaName}</div>
+              )}
+              {game.arenaLocation && (
+                <a
+                  href={`https://maps.google.com/maps?q=${encodeURIComponent(game.arenaLocation)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-400 hover:text-blue-300 text-xs flex items-center gap-1 mt-0.5 underline underline-offset-2 break-words"
+                >
+                  📍 {game.arenaLocation}
+                </a>
+              )}
+            </div>
+          </div>
+        )}
+
         <div className="glass-card rounded-xl p-3 sm:p-4">
           <div className="flex justify-between text-center">
             <div>

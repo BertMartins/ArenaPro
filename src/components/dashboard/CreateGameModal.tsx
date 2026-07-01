@@ -33,6 +33,8 @@ export default function CreateGameModal({
         type: gameType,
         paymentWindowStart: form.paymentWindowStart.value,
         paymentDeadlineMinutes: Number(form.paymentDeadlineMinutes.value),
+        arenaName: form.arenaName.value.trim() || undefined,
+        arenaLocation: form.arenaLocation.value.trim() || undefined,
       };
 
       const res = await fetch("/api/games", {
@@ -149,6 +151,32 @@ export default function CreateGameModal({
             <div className="flex items-center gap-2">
               <input type="checkbox" name="twoWinsRule" defaultChecked />
               <label className="text-sm text-gray-300">Regra de 2 vitórias?</label>
+            </div>
+
+            {/* ARENA */}
+            <div className="border-t border-white/10 pt-4 space-y-3">
+              <p className="text-xs text-gray-500 uppercase tracking-wide font-bold">Arena (opcional)</p>
+              <div>
+                <label className="text-sm text-gray-300 block mb-1">Nome da Arena</label>
+                <input
+                  name="arenaName"
+                  type="text"
+                  placeholder="Ex: Arena Bolinha Club"
+                  className="w-full p-2 rounded bg-gray-800 text-white border border-white/10 focus:border-orange-400 focus:ring-2 focus:ring-orange-500 transition"
+                />
+              </div>
+              <div>
+                <label className="text-sm text-gray-300 block mb-1">Localidade</label>
+                <input
+                  name="arenaLocation"
+                  type="text"
+                  placeholder="Ex: Rua das Flores 123, São Paulo"
+                  className="w-full p-2 rounded bg-gray-800 text-white border border-white/10 focus:border-orange-400 focus:ring-2 focus:ring-orange-500 transition"
+                />
+                <p className="text-gray-500 text-xs mt-1">
+                  Os jogadores poderão clicar para abrir no mapa.
+                </p>
+              </div>
             </div>
           </div>
 

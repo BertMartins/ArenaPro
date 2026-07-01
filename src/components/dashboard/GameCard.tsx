@@ -37,6 +37,22 @@ export default function GameCard({
           <div className="text-gray-300 text-xs sm:text-sm flex items-center gap-1 mt-0.5">
             🧍 {playersCount}/{game.maxPlayers} jogadores
           </div>
+          {game.arenaName && (
+            <div className="text-gray-400 text-xs mt-0.5 flex items-center gap-1">
+              🏟️ {game.arenaName}
+            </div>
+          )}
+          {game.arenaLocation && (
+            <a
+              href={`https://maps.google.com/maps?q=${encodeURIComponent(game.arenaLocation)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              className="text-blue-400 hover:text-blue-300 text-xs mt-0.5 flex items-center gap-1 underline underline-offset-2 w-fit"
+            >
+              📍 {game.arenaLocation}
+            </a>
+          )}
         </div>
         <div className="animate-bounceSoft text-xl sm:text-2xl">🏐</div>
       </div>

@@ -73,6 +73,8 @@ model Game {
   pointsPerMatch Int      @default(25)
   paymentWindowStart    String @default("12:00")
   paymentDeadlineMinutes Int   @default(60)
+  arenaName     String?
+  arenaLocation String?
   createdAt   DateTime    @default(now())
 
   createdById String
