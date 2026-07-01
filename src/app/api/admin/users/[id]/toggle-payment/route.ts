@@ -2,14 +2,15 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { verifyToken } from "@/lib/jwt";
 
-export async function POST(req: Request, { params }: any) {
+export async function POST(req: Request, context: { params: Promise<{ id: string }> }) {
   try {
+    const { id } = await context.params;
     const admin = await verifyToken();
     if (!admin || admin.role !== "admin")
       return NextResponse.json({ error: "Acesso negado" }, { status: 401 });
 
     const user = await prisma.user.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!user)
@@ -18,7 +19,7 @@ export async function POST(req: Request, { params }: any) {
     const newType = user.paymentType === "monthly" ? "daily" : "monthly";
 
     await prisma.user.update({
-      where: { id: params.id },
+      where: { id },
       data: { paymentType: newType },
     });
 

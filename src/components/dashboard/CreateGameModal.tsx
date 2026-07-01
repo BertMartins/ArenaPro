@@ -35,6 +35,8 @@ export default function CreateGameModal({
         paymentDeadlineMinutes: Number(form.paymentDeadlineMinutes.value),
         arenaName: form.arenaName.value.trim() || undefined,
         arenaLocation: form.arenaLocation.value.trim() || undefined,
+        startTime: form.startTime.value || undefined,
+        endTime: form.endTime.value || undefined,
       };
 
       const res = await fetch("/api/games", {
@@ -151,6 +153,29 @@ export default function CreateGameModal({
             <div className="flex items-center gap-2">
               <input type="checkbox" name="twoWinsRule" defaultChecked />
               <label className="text-sm text-gray-300">Regra de 2 vitórias?</label>
+            </div>
+
+            {/* HORÁRIO */}
+            <div className="border-t border-white/10 pt-4 space-y-3">
+              <p className="text-xs text-gray-500 uppercase tracking-wide font-bold">Horário do Jogo (opcional)</p>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-sm text-gray-300 block mb-1">Início</label>
+                  <input
+                    name="startTime"
+                    type="time"
+                    className="w-full p-2 rounded bg-gray-800 text-white border border-white/10 focus:border-orange-400 focus:ring-2 focus:ring-orange-500 transition"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm text-gray-300 block mb-1">Término</label>
+                  <input
+                    name="endTime"
+                    type="time"
+                    className="w-full p-2 rounded bg-gray-800 text-white border border-white/10 focus:border-orange-400 focus:ring-2 focus:ring-orange-500 transition"
+                  />
+                </div>
+              </div>
             </div>
 
             {/* ARENA */}

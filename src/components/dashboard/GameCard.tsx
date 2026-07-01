@@ -37,6 +37,11 @@ export default function GameCard({
           <div className="text-gray-300 text-xs sm:text-sm flex items-center gap-1 mt-0.5">
             🧍 {playersCount}/{game.maxPlayers} jogadores
           </div>
+          {(game.startTime || game.endTime) && (
+            <div className="text-gray-400 text-xs mt-0.5 flex items-center gap-1">
+              🕐 {game.startTime ?? "?"} {game.endTime ? `– ${game.endTime}` : ""}
+            </div>
+          )}
           {game.arenaName && (
             <div className="text-gray-400 text-xs mt-0.5 flex items-center gap-1">
               🏟️ {game.arenaName}

@@ -16,6 +16,8 @@ type CreatePayload = {
   paymentDeadlineMinutes?: number;
   arenaName?: string;
   arenaLocation?: string;
+  startTime?: string;
+  endTime?: string;
 };
 
 function isValidDateString(s: any) {
@@ -62,6 +64,8 @@ export async function POST(req: Request) {
       paymentDeadlineMinutes: Number(body.paymentDeadlineMinutes ?? 60),
       arenaName: body.arenaName?.trim() || undefined,
       arenaLocation: body.arenaLocation?.trim() || undefined,
+      startTime: body.startTime?.trim() || undefined,
+      endTime: body.endTime?.trim() || undefined,
     };
 
     // validações
@@ -120,6 +124,8 @@ export async function POST(req: Request) {
         paymentDeadlineMinutes: payload.paymentDeadlineMinutes!,
         arenaName: payload.arenaName,
         arenaLocation: payload.arenaLocation,
+        startTime: payload.startTime,
+        endTime: payload.endTime,
         createdById: user.id,
       },
     });

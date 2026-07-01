@@ -192,6 +192,11 @@ export default function GameDetailPanel({
         <p className="text-blue-100 mt-1 text-xs sm:text-sm">
           📅 {new Date(game.date.slice(0, 10) + "T12:00:00Z").toLocaleDateString("pt-BR", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}
         </p>
+        {(game.startTime || game.endTime) && (
+          <p className="text-blue-200 mt-0.5 text-xs sm:text-sm">
+            🕐 {game.startTime ?? "?"}{game.endTime ? ` – ${game.endTime}` : ""}
+          </p>
+        )}
       </div>
 
       <div className="p-3 sm:p-5 space-y-4">
