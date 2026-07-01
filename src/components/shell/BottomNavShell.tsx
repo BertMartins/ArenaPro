@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useNav, type Tab } from "@/context/NavContext";
+import Image from "next/image";
 
 export default function BottomNavShell() {
   const nav = useNav()!;
@@ -17,35 +18,63 @@ export default function BottomNavShell() {
   }, [nav.tab]);
 
   const items: { id: Tab; label: string; icon: string; badge?: boolean }[] = [
-    { id: "home", label: "Início", icon: "fa-house" },
-    { id: "games", label: "Jogos", icon: "fa-calendar" },
-    { id: "play", label: "Play", icon: "fa-play-circle", badge: hasActiveGame },
-    { id: "stats", label: "Stats", icon: "fa-chart-bar" },
+    { id: "home",  label: "Início", icon: "fa-house" },
+    { id: "games", label: "Jogos",  icon: "fa-calendar-days" },
+    { id: "play",  label: "Play",   icon: "fa-volleyball", badge: hasActiveGame },
+    { id: "stats", label: "Stats",  icon: "fa-chart-bar" },
   ];
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 bg-gray-900/95 backdrop-blur-lg border-t border-gray-700 shadow-2xl z-50"
+      className="bottom-nav fixed bottom-0 left-0 right-0 z-50"
       style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
     >
-      <div className="grid grid-cols-4 gap-0.5 p-1 sm:p-2 max-w-2xl mx-auto">
+      <div className="grid grid-cols-4 gap-0.5 px-2 pt-1 pb-2 max-w-2xl mx-auto">
         {items.map((item) => {
           const isActive = nav.tab === item.id && !nav.subView;
           return (
             <button
               key={item.id}
               onClick={() => nav.setTab(item.id)}
-              className={`relative flex flex-col items-center justify-center py-2 sm:py-3 rounded-lg transition-all ${
-                isActive
-                  ? "bg-orange-500 text-white shadow-lg shadow-orange-500/40"
-                  : "text-gray-400 hover:bg-gray-800 hover:text-white"
-              }`}
+              className="relative flex flex-col items-center justify-center py-2 sm:py-2.5 rounded-xl transition-all"
+              style={isActive
+                ? {
+                    background: "linear-gradient(135deg, #FB6600, #FB9A14)",
+                    boxShadow: "0 4px 16px rgba(251,102,0,0.45)"
+                  }
+                : { background: "transparent" }
+              }
             >
               {item.badge && (
-                <div className="absolute top-1 right-1 w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+                <div
+                  className="absolute top-1 right-1 w-2 h-2 rounded-full animate-pulse"
+                  style={{ background: "#22C55E", boxShadow: "0 0 6px rgba(34,197,94,0.8)" }}
+                />
               )}
-              <i className={`fas ${item.icon} text-lg sm:text-xl mb-0.5 sm:mb-1`} />
-              <span className="text-[10px] sm:text-xs font-medium">{item.label}</span>
+
+              {/* Ícone de Play usa logo do clube */}
+              {item.id === "play" ? (
+                <div className="mb-0.5">
+                  <Image
+                    src="/logo.png"
+                    alt="Play"
+                    width={22}
+                    height={22}
+                    style={isActive ? {} : { opacity: 0.55, filter: "grayscale(0.4)" }}
+                  />
+                </div>
+              ) : (
+                <i
+                  className={`fas ${item.icon} text-lg sm:text-xl mb-0.5 sm:mb-1`}
+                  style={{ color: isActive ? "#FDFDFD" : "#5A6F8D" }}
+                />
+              )}
+              <span
+                className="text-[10px] sm:text-xs font-semibold"
+                style={{ color: isActive ? "#FDFDFD" : "#5A6F8D" }}
+              >
+                {item.label}
+              </span>
             </button>
           );
         })}

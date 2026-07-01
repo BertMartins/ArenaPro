@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { FaSignOutAlt } from "react-icons/fa";
+import { FaSignOutAlt, FaTrophy } from "react-icons/fa";
+import Image from "next/image";
 
 export default function PlayerHeader() {
   const [stats, setStats] = useState<any>(null);
@@ -13,56 +14,98 @@ export default function PlayerHeader() {
     })();
   }, []);
 
-  if (!stats) return null;
+  if (!stats) return (
+    <div className="rounded-2xl overflow-hidden mb-1">
+      <div className="skeleton h-36" />
+    </div>
+  );
 
   return (
-    <header className="rounded-b-3xl overflow-hidden shadow-md">
+    <header className="rounded-2xl overflow-hidden shadow-2xl">
       <div
-        className="p-4 sm:p-6 text-white"
-        style={{ background: "linear-gradient(90deg, #ff7a18, #ff9e32)" }}
+        className="p-4 sm:p-6 text-white relative overflow-hidden"
+        style={{
+          background: "linear-gradient(135deg, #001A46 0%, #004B9A 65%, #0273D0 100%)",
+          borderBottom: "2px solid rgba(251,102,0,0.4)"
+        }}
       >
-        {/* TOP */}
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2 sm:gap-3">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/20 flex items-center justify-center text-xl sm:text-2xl">
-              🏐
+        {/* Decoração */}
+        <div style={{
+          position: "absolute", top: "-40px", right: "-40px",
+          width: 180, height: 180, borderRadius: "50%",
+          background: "rgba(251,102,0,0.08)", pointerEvents: "none"
+        }} />
+
+        {/* TOP ROW */}
+        <div className="flex items-center justify-between mb-4 relative z-10">
+          <div className="flex items-center gap-3">
+            <div
+              className="w-12 h-12 sm:w-14 sm:h-14 rounded-full flex items-center justify-center flex-shrink-0"
+              style={{
+                background: "rgba(251,102,0,0.15)",
+                border: "2px solid rgba(251,102,0,0.5)",
+                boxShadow: "0 0 16px rgba(251,102,0,0.3)"
+              }}
+            >
+              <Image src="/logo.png" alt="Bolinha Club" width={36} height={36} className="rounded-full" />
             </div>
             <div>
               <div className="font-bold text-base sm:text-lg leading-tight">{stats.name}</div>
-              <div className="text-xs sm:text-sm text-white/80">🏆 {stats.titles} Títulos</div>
+              <div className="text-xs sm:text-sm flex items-center gap-1" style={{ color: "#FB9A14" }}>
+                <FaTrophy size={11} /> {stats.titles} Títulos · Jogador
+              </div>
             </div>
           </div>
 
           <button
-            className="text-white bg-white/20 hover:bg-white/30 p-2 sm:p-3 rounded-lg"
+            className="transition p-2 sm:p-2.5 rounded-xl text-white"
+            style={{ background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.15)" }}
             onClick={async () => {
               await fetch("/api/auth/logout", { method: "POST" });
               window.location.href = "/login";
             }}
+            title="Sair"
           >
-            <FaSignOutAlt size={18} />
+            <FaSignOutAlt size={16} />
           </button>
         </div>
 
-        {/* CARDS */}
-        <div className="grid grid-cols-3 gap-2 sm:gap-3">
-          <div className="rounded-xl bg-white/10 backdrop-blur py-3 sm:py-4 flex flex-col items-center">
-            <div className="w-10 h-10 sm:w-11 sm:h-11 bg-purple-600/40 rounded-full flex items-center justify-center text-lg sm:text-xl font-bold">
+        {/* STATS */}
+        <div className="grid grid-cols-3 gap-2 sm:gap-3 relative z-10">
+          <div
+            className="rounded-xl py-3 sm:py-4 flex flex-col items-center gap-1"
+            style={{ background: "rgba(0,0,0,0.25)", border: "1px solid rgba(251,102,0,0.25)" }}
+          >
+            <div
+              className="w-10 h-10 sm:w-11 sm:h-11 rounded-full flex items-center justify-center font-black text-lg sm:text-xl"
+              style={{ background: "linear-gradient(135deg,#FB6600,#FB9A14)", boxShadow: "0 0 12px rgba(251,102,0,0.4)" }}
+            >
               {stats.level}
             </div>
-            <span className="text-xs mt-1 sm:mt-2 text-white/90">Nível</span>
+            <span className="text-xs text-white/80 font-medium">Nível</span>
           </div>
 
-          <div className="rounded-xl bg-white/10 backdrop-blur py-3 sm:py-4 flex flex-col items-center">
-            <span className="text-2xl sm:text-3xl font-bold">{stats.wins}</span>
-            <span className="text-xs mt-1 sm:mt-2 text-white/90">Vitórias</span>
+          <div
+            className="rounded-xl py-3 sm:py-4 flex flex-col items-center gap-1"
+            style={{ background: "rgba(0,0,0,0.25)", border: "1px solid rgba(255,255,255,0.08)" }}
+          >
+            <span className="text-2xl sm:text-3xl font-black" style={{ color: "#FB9A14" }}>{stats.wins}</span>
+            <span className="text-xs text-white/80 font-medium">Vitórias</span>
           </div>
 
-          <div className="rounded-xl bg-white/10 backdrop-blur py-3 sm:py-4 flex flex-col items-center">
-            <span className="text-2xl sm:text-3xl font-bold">{stats.rate}%</span>
-            <span className="text-xs mt-1 sm:mt-2 text-white/90">Taxa</span>
+          <div
+            className="rounded-xl py-3 sm:py-4 flex flex-col items-center gap-1"
+            style={{ background: "rgba(0,0,0,0.25)", border: "1px solid rgba(255,255,255,0.08)" }}
+          >
+            <span className="text-2xl sm:text-3xl font-black text-white">{stats.rate}%</span>
+            <span className="text-xs text-white/80 font-medium">Taxa</span>
           </div>
         </div>
+
+        <div
+          className="absolute bottom-0 left-0 right-0 h-[2px]"
+          style={{ background: "linear-gradient(90deg, transparent, #FB6600, #FB9A14, transparent)" }}
+        />
       </div>
     </header>
   );

@@ -16,35 +16,68 @@ export default function AdminActionsBar({ onCreate }: { onCreate: () => void }) 
 
   return (
     <div className="space-y-3">
+      {/* CRIAR JOGO */}
       <button
         onClick={onCreate}
-        className="w-full py-3 bg-gradient-to-r from-orange-500 to-orange-400 text-white rounded-xl font-bold shadow-lg flex items-center justify-center gap-2 text-base"
+        className="w-full py-3.5 rounded-2xl text-white font-black text-base tracking-wide flex items-center justify-center gap-2 transition-all"
+        style={{
+          background: "linear-gradient(135deg, #FB6600 0%, #FB9A14 100%)",
+          boxShadow: "0 6px 24px rgba(251,102,0,0.45), inset 0 1px 0 rgba(255,255,255,0.15)"
+        }}
+        onMouseEnter={e => (e.currentTarget.style.transform = "translateY(-1px)")}
+        onMouseLeave={e => (e.currentTarget.style.transform = "translateY(0)")}
       >
-        <span>＋</span> CRIAR NOVO JOGO
+        <i className="fas fa-plus-circle text-lg" />
+        CRIAR NOVO JOGO
       </button>
 
+      {/* AÇÕES SECUNDÁRIAS */}
       <div className="grid grid-cols-3 gap-2">
+        {/* Usuários */}
         <button
-          className="py-2 sm:py-3 rounded-xl bg-blue-500 text-white font-bold text-xs sm:text-sm flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-1"
           onClick={() => goTo("users")}
+          className="py-3 rounded-xl text-white font-bold text-xs sm:text-sm flex flex-col items-center gap-1 transition-all"
+          style={{
+            background: "linear-gradient(135deg, #001A46 0%, #004B9A 100%)",
+            border: "1px solid rgba(2,115,208,0.35)",
+            boxShadow: "0 4px 12px rgba(0,26,70,0.5)"
+          }}
+          onMouseEnter={e => (e.currentTarget.style.borderColor = "rgba(251,102,0,0.5)")}
+          onMouseLeave={e => (e.currentTarget.style.borderColor = "rgba(2,115,208,0.35)")}
         >
-          <span>👥</span>
+          <i className="fas fa-users text-base" style={{ color: "#0273D0" }} />
           <span>USUÁRIOS</span>
         </button>
 
+        {/* Mensalistas */}
         <button
-          className="py-2 sm:py-3 rounded-xl bg-green-600 text-white font-bold text-xs sm:text-sm flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-1"
           onClick={() => goTo("mensalistas")}
+          className="py-3 rounded-xl text-white font-bold text-xs sm:text-sm flex flex-col items-center gap-1 transition-all"
+          style={{
+            background: "linear-gradient(135deg, #064E3B 0%, #065F46 100%)",
+            border: "1px solid rgba(16,185,129,0.35)",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.3)"
+          }}
+          onMouseEnter={e => (e.currentTarget.style.borderColor = "rgba(251,102,0,0.5)")}
+          onMouseLeave={e => (e.currentTarget.style.borderColor = "rgba(16,185,129,0.35)")}
         >
-          <span>💳</span>
+          <i className="fas fa-credit-card text-base text-green-400" />
           <span>MENSALISTA</span>
         </button>
 
+        {/* Financeiro */}
         <button
-          className="py-2 sm:py-3 rounded-xl bg-purple-600 text-white font-bold text-xs sm:text-sm flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-1 leading-tight"
           onClick={() => goTo("financeiro")}
+          className="py-3 rounded-xl text-white font-bold text-xs sm:text-sm flex flex-col items-center gap-1 transition-all"
+          style={{
+            background: "linear-gradient(135deg, #3B0764 0%, #6D28D9 100%)",
+            border: "1px solid rgba(139,92,246,0.35)",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.3)"
+          }}
+          onMouseEnter={e => (e.currentTarget.style.borderColor = "rgba(251,102,0,0.5)")}
+          onMouseLeave={e => (e.currentTarget.style.borderColor = "rgba(139,92,246,0.35)")}
         >
-          <span>📈</span>
+          <i className="fas fa-chart-line text-base text-purple-400" />
           <span>FINANCEIRO</span>
         </button>
       </div>

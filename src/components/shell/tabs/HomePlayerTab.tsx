@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import PlayerHeader from "@/components/dashboard/PlayerHeader";
 import GameCard from "@/components/dashboard/GameCard";
 import { useNav } from "@/context/NavContext";
+import Image from "next/image";
 
 export default function HomePlayerTab() {
   const nav = useNav()!;
@@ -49,18 +50,35 @@ export default function HomePlayerTab() {
     <div className="p-3 sm:p-5 space-y-4 pb-24 max-w-2xl mx-auto">
       <PlayerHeader />
 
+      {/* SEÇÃO JOGOS */}
       <section>
-        <h2 className="text-base sm:text-lg font-semibold text-white mb-3 flex items-center gap-2">
-          <span className="text-orange-400">📅</span> Jogos Disponíveis
-        </h2>
+        <div className="flex items-center gap-2 mb-3">
+          <div
+            className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0"
+            style={{ background: "rgba(251,102,0,0.2)", border: "1px solid rgba(251,102,0,0.4)" }}
+          >
+            <i className="fas fa-calendar-days text-xs" style={{ color: "#FB6600" }} />
+          </div>
+          <h2 className="text-base sm:text-lg font-bold text-white">Jogos Disponíveis</h2>
+        </div>
 
-        {loading && <div className="text-gray-400">Carregando jogos...</div>}
-
-        {!loading && games.length === 0 && (
-          <div className="glass-card p-6 rounded text-gray-400">Nenhum jogo encontrado.</div>
+        {loading && (
+          <div className="space-y-3">
+            {[1,2].map(i => <div key={i} className="skeleton h-28 rounded-2xl" />)}
+          </div>
         )}
 
-        <div className="space-y-4">
+        {!loading && games.length === 0 && (
+          <div
+            className="p-8 rounded-2xl text-center"
+            style={{ background: "rgba(0,26,70,0.5)", border: "1px solid rgba(2,115,208,0.15)" }}
+          >
+            <Image src="/logo.png" alt="Bolinha Club" width={48} height={48} className="mx-auto mb-3 opacity-40" />
+            <p style={{ color: "#5A6F8D" }}>Nenhum jogo disponível no momento.</p>
+          </div>
+        )}
+
+        <div className="space-y-3">
           {games.map((g) => (
             <GameCard
               key={g.id}
