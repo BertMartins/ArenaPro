@@ -25,7 +25,6 @@ export default function BottomNav({ active }: { active: string }) {
 
   const items = [
     { id: "home", label: "Início", icon: "fa-house", href: homeHref },
-    { id: "games", label: "Jogos", icon: "fa-calendar", href: "/games" },
     { id: "play", label: "Play", icon: "fa-play-circle", href: "/play", badge: hasActiveGame },
     { id: "stats", label: "Stats", icon: "fa-chart-bar", href: "/stats" },
   ];
@@ -35,7 +34,7 @@ export default function BottomNav({ active }: { active: string }) {
       className="fixed bottom-0 left-0 right-0 bg-gray-900/95 backdrop-blur-lg border-t border-gray-700 shadow-2xl z-50"
       style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
     >
-      <div className="grid grid-cols-4 gap-0.5 p-1 sm:p-2 max-w-2xl mx-auto">
+      <div className="grid grid-cols-3 gap-0.5 p-1 sm:p-2 max-w-2xl mx-auto">
         {items.map((item) => {
           const isActive = active === item.id;
           return (
