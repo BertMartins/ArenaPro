@@ -230,7 +230,7 @@ export default function PlayTab() {
     <div className="pb-24 animate-fadeIn max-w-2xl mx-auto">
       <div className="p-4 sm:p-6" style={{ background: "linear-gradient(135deg, #ff7a18, #ff9e32)" }}>
         <h1 className="text-2xl sm:text-3xl font-black text-white tracking-wider">⚡ JOGO EM ANDAMENTO</h1>
-        <p className="text-orange-100 text-sm">📅 {new Date(game.date).toLocaleDateString("pt-BR")}</p>
+        <p className="text-orange-100 text-sm">📅 {new Date(game.date.slice(0, 10) + "T12:00:00Z").toLocaleDateString("pt-BR")}</p>
       </div>
 
       <div className="p-3 sm:p-5 space-y-4">

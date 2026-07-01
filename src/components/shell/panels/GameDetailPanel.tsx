@@ -8,9 +8,9 @@ const LEVEL_COLORS: Record<number, string> = {
 };
 
 function buildWindowStart(game: any): Date {
-  const d = new Date(game.date);
+  const [year, month, day] = (game.date as string).slice(0, 10).split("-").map(Number);
   const [hh, mm] = (game.paymentWindowStart || "12:00").split(":").map(Number);
-  return new Date(d.getFullYear(), d.getMonth(), d.getDate(), hh || 0, mm || 0, 0, 0);
+  return new Date(year, month - 1, day, hh || 0, mm || 0, 0, 0);
 }
 
 function paymentDeadline(player: any, game: any): Date | null {
@@ -190,7 +190,7 @@ export default function GameDetailPanel({
         </button>
         <h1 className="text-2xl sm:text-3xl font-black text-white tracking-wider">DETALHES DO JOGO</h1>
         <p className="text-blue-100 mt-1 text-xs sm:text-sm">
-          📅 {new Date(game.date).toLocaleDateString("pt-BR", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}
+          📅 {new Date(game.date.slice(0, 10) + "T12:00:00Z").toLocaleDateString("pt-BR", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}
         </p>
       </div>
 

@@ -3,7 +3,8 @@
  */
 export function parseLocalDate(dateStr: string) {
   const [year, month, day] = dateStr.split("-").map(Number);
-  return new Date(year, month - 1, day, 0, 0, 0);
+  // Usa meio-dia UTC para evitar deslocamento de fuso horário no frontend
+  return new Date(Date.UTC(year, month - 1, day, 12, 0, 0));
 }
 
 /**
@@ -20,4 +21,14 @@ export function todayLocal() {
  */
 export function formatDateBR(date: Date) {
   return date.toLocaleDateString("pt-BR");
+}
+
+/**
+ * Converte string ISO do banco para Date sem deslocar o dia.
+ * Usa o segmento YYYY-MM-DD e reposiciona em meio-dia UTC.
+ */
+export function parseGameDate(iso: string): Date {
+  const dateOnly = iso.slice(0, 10); // "2026-07-02"
+  const [year, month, day] = dateOnly.split("-").map(Number);
+  return new Date(Date.UTC(year, month - 1, day, 12, 0, 0));
 }

@@ -32,7 +32,7 @@ export default function GameCard({
       <div className="flex justify-between items-center">
         <div className="flex flex-col">
           <div className="flex items-center text-orange-400 font-bold text-base sm:text-lg gap-2">
-            📅 {new Date(game.date).toLocaleDateString("pt-BR")}
+            📅 {new Date(game.date.slice(0, 10) + "T12:00:00Z").toLocaleDateString("pt-BR")}
           </div>
           <div className="text-gray-300 text-xs sm:text-sm flex items-center gap-1 mt-0.5">
             🧍 {playersCount}/{game.maxPlayers} jogadores
