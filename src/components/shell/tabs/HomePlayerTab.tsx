@@ -22,7 +22,7 @@ export default function HomePlayerTab() {
   async function loadGames() {
     setLoading(true);
     try {
-      const res = await fetch("/api/games");
+      const res = await fetch("/api/games/available");
       const data = await res.json();
       if (res.ok) {
         const now = new Date();

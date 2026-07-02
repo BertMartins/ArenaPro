@@ -80,7 +80,7 @@ export async function createGame(payload: CreateGameInput, createdById: string) 
   });
 }
 
-export async function listGames() {
+async function reconcileOpenGames() {
   const openGameIds = await prisma.game.findMany({
     where: { status: "open" },
     select: { id: true },
@@ -88,8 +88,28 @@ export async function listGames() {
   for (const g of openGameIds) {
     await reconcileGame(g.id);
   }
+}
+
+export async function listGames() {
+  await reconcileOpenGames();
 
   return prisma.game.findMany({
+    orderBy: { date: "asc" },
+    include: {
+      players: {
+        include: {
+          user: { include: { stats: true } },
+        },
+      },
+    },
+  });
+}
+
+export async function listAvailableGames() {
+  await reconcileOpenGames();
+
+  return prisma.game.findMany({
+    where: { status: { not: "finished" } },
     orderBy: { date: "asc" },
     include: {
       players: {
